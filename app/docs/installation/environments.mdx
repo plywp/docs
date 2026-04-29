@@ -1,0 +1,483 @@
+import { Breadcrumb } from '@/components/Breadcrumb';
+import { TableOfContents } from '@/components/TableOfContents';
+import { CodeBlock } from '@/components/CodeBlock';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+export const metadata = {
+  title: 'Environment-Specific Installation - PlyWP Documentation',
+  description: 'Installation guides for different environments and platforms.',
+};
+
+<Breadcrumb />
+
+<div className="grid md:grid-cols-[1fr_300px] gap-8">
+<div className="prose">
+
+# Environment-Specific Installation
+
+This guide covers installation on different environments and platforms.
+
+## Local Development
+
+### macOS
+
+```bash
+# Install Homebrew (if not installed)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Node.js
+brew install node
+
+# Install Go
+brew install go
+
+# Verify installations
+node --version
+npm --version
+go version
+```
+
+Clone and setup:
+
+```bash
+# Clone both repositories
+git clone https://github.com/plywp/panel.git
+git clone https://github.com/plywp/plyorde.git
+
+# Setup Panel
+cd panel
+npm install
+npm run dev
+
+# In another terminal, setup Plyorde
+cd ../plyorde
+go mod download
+go run ./cmd/plyorde -config config.dev.yml
+```
+
+### Windows (WSL2)
+
+Windows Subsystem for Linux is recommended for development:
+
+```bash
+# Enable WSL2
+wsl --install
+
+# Open WSL2 terminal
+wsl
+
+# Install Node.js
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Install Go
+wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+```
+
+Then follow Linux installation steps.
+
+### Linux (Ubuntu/Debian)
+
+```bash
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install Node.js
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Install Go
+wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+source ~/.bashrc
+
+# Verify installations
+node --version && npm --version && go version
+```
+
+## Server Installation
+
+### Debian 11/12
+
+Complete setup for production:
+
+```bash
+# 1. Update system
+sudo apt update && sudo apt upgrade -y
+
+# 2. Install runtime dependencies
+sudo apt install -y \
+  curl wget git build-essential \
+  nodejs npm \
+  postgresql postgresql-contrib \
+  nginx \
+  certbot python3-certbot-nginx
+
+# 3. Install Go
+wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+source ~/.bashrc
+
+# 4. Follow Panel and Plyorde installation guides
+```
+
+### Ubuntu 22.04 LTS
+
+```bash
+# 1. Update system
+sudo apt update && sudo apt upgrade -y
+
+# 2. Install dependencies
+sudo apt install -y \
+  curl wget git build-essential \
+  npm \
+  postgresql postgresql-contrib \
+  nginx \
+  certbot python3-certbot-nginx
+
+# 3. Install Node.js 18+ (Ubuntu 22.04 has older node)
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# 4. Install Go
+wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+
+# 5. Continue with installation guides
+```
+
+### CentOS/RHEL 8
+
+```bash
+# 1. Update system
+sudo yum update -y
+
+# 2. Install dependencies
+sudo yum groupinstall -y "Development Tools"
+sudo yum install -y \
+  git wget curl \
+  nodejs \
+  postgresql postgresql-server postgresql-contrib \
+  nginx \
+  certbot python3-certbot-nginx
+
+# 3. Initialize PostgreSQL
+sudo postgresql-setup initdb
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+
+# 4. Install Go
+wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+
+# 5. Follow installation guides
+```
+
+## Docker Installation
+
+### Docker Compose Setup
+
+Create `docker-compose.yml`:
+
+```yaml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: plywp
+      POSTGRES_PASSWORD: secure_password
+      POSTGRES_DB: plywp
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  plyorde:
+    build:
+      context: ./plyorde
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://plywp:secure_password@postgres:5432/plywp
+      LOG_LEVEL: info
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+    volumes:
+      - ./plyorde/config.yml:/etc/plyorde/config.yml
+
+  panel:
+    build:
+      context: ./panel
+      dockerfile: Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: http://plyorde:8081
+      DATABASE_URL: postgresql://plywp:secure_password@postgres:5432/plywp
+      JWT_SECRET: your-secret-key
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - plyorde
+
+volumes:
+  postgres_data:
+```
+
+Build and run:
+
+```bash
+docker-compose up -d
+```
+
+Access Panel at `http://localhost:3000`
+
+## Cloud Provider Guides
+
+### AWS EC2
+
+Recommended setup for AWS:
+
+```bash
+# 1. Launch EC2 instance
+# - Ubuntu 22.04 LTS (t3.small or larger)
+# - Open ports: 80, 443, 3000, 8081
+# - Create and download key pair
+
+# 2. Connect to instance
+ssh -i your-key.pem ubuntu@your-ec2-ip
+
+# 3. Update system
+sudo apt update && sudo apt upgrade -y
+
+# 4. Install all dependencies
+sudo apt install -y \
+  curl wget git build-essential \
+  nodejs npm \
+  postgresql postgresql-contrib \
+  nginx certbot python3-certbot-nginx
+
+# 5. Install Go (if needed)
+wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
+
+# 6. Follow standard installation guides
+```
+
+Use RDS for PostgreSQL:
+
+```bash
+# Update Panel configuration to use RDS endpoint
+DATABASE_URL=postgresql://user:pass@your-rds-endpoint.amazonaws.com:5432/plywp
+```
+
+### DigitalOcean Droplet
+
+Setup on DigitalOcean:
+
+```bash
+# 1. Create Droplet
+# - Ubuntu 22.04
+# - Minimum 2GB RAM
+# - Enable Monitoring
+
+# 2. Connect and update
+ssh root@your-droplet-ip
+apt update && apt upgrade -y
+
+# 3. Create non-root user (optional but recommended)
+adduser plywp
+usermod -aG sudo plywp
+
+# 4. Install dependencies
+apt install -y \
+  curl wget git build-essential \
+  nodejs npm \
+  postgresql postgresql-contrib \
+  nginx certbot python3-certbot-nginx
+
+# 5. Install Go
+wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
+tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
+
+# 6. Continue with installation guides
+```
+
+### Heroku (Panel Only)
+
+Heroku deployment for Panel:
+
+```bash
+# 1. Install Heroku CLI
+curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+
+# 2. Login to Heroku
+heroku login
+
+# 3. Create app
+heroku create your-app-name
+
+# 4. Add PostgreSQL addon
+heroku addons:create heroku-postgresql:standard-0
+
+# 5. Deploy
+git push heroku main
+
+# 6. Open app
+heroku open
+```
+
+## Containerization
+
+### Dockerfile for Panel
+
+```dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY . .
+RUN npm run build
+
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+### Dockerfile for Plyorde
+
+```dockerfile
+FROM golang:1.21-alpine as builder
+
+WORKDIR /app
+COPY . .
+RUN go build -o plyorde ./cmd/plyorde
+
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+WORKDIR /app
+COPY --from=builder /app/plyorde .
+COPY config.yml /etc/plyorde/config.yml
+
+EXPOSE 8081
+CMD ["./plyorde", "-config", "/etc/plyorde/config.yml"]
+```
+
+## Reverse Proxy Setup
+
+### Nginx with SSL
+
+Complete nginx configuration with SSL:
+
+```nginx
+# /etc/nginx/sites-available/plywp
+upstream panel_backend {
+    server localhost:3000;
+}
+
+upstream plyorde_backend {
+    server localhost:8081;
+}
+
+server {
+    listen 80;
+    server_name plywp.example.com;
+    
+    # Redirect to HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name plywp.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/plywp.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/plywp.example.com/privkey.pem;
+    
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    # Panel
+    location / {
+        proxy_pass http://panel_backend;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # API
+    location /api {
+        proxy_pass http://plyorde_backend;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+```
+
+Enable configuration:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/plywp /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+
+# Setup SSL with Certbot
+sudo certbot certonly --nginx -d plywp.example.com
+```
+
+### Apache Configuration
+
+```apache
+<VirtualHost *:80>
+    ServerName plywp.example.com
+    Redirect permanent / https://plywp.example.com/
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName plywp.example.com
+    
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/plywp.example.com/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/plywp.example.com/privkey.pem
+
+    # Panel Proxy
+    ProxyPreserveHost On
+    ProxyPass / http://localhost:3000/
+    ProxyPassReverse / http://localhost:3000/
+
+    # API Proxy
+    ProxyPass /api http://localhost:8081/
+    ProxyPassReverse /api http://localhost:8081/
+</VirtualHost>
+```
+
+## Next Steps
+
+1. Choose your environment and follow the specific guide
+2. Complete Panel installation
+3. Complete Plyorde installation
+4. Configure your reverse proxy
+5. Review [Security Guide](/docs/guides/security)
+
+</div>
+
+<TableOfContents />
+</div>

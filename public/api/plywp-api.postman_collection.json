@@ -1,0 +1,606 @@
+{
+  "info": {
+    "_postman_id": "plywp-api-collection",
+    "name": "PlyWP API",
+    "description": "Complete API documentation for PlyWP Panel and Plyorde services",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Client API",
+      "description": "End-user API for managing WordPress sites",
+      "item": [
+        {
+          "name": "Sites",
+          "item": [
+            {
+              "name": "List Sites",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{api_key}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/client/sites",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "client", "sites"]
+                },
+                "description": "Retrieve all sites accessible to the authenticated user"
+              },
+              "response": []
+            },
+            {
+              "name": "Get Site Details",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{api_key}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/client/sites/{{site_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "client", "sites", "{{site_id}}"]
+                },
+                "description": "Get detailed information about a specific site"
+              },
+              "response": []
+            },
+            {
+              "name": "Site Health",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{api_key}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/client/sites/{{site_id}}/health",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "client", "sites", "{{site_id}}", "health"]
+                },
+                "description": "Check the health status of a WordPress site"
+              },
+              "response": []
+            },
+            {
+              "name": "Get Admin Credentials",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{api_key}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/client/sites/{{site_id}}/credentials",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "client", "sites", "{{site_id}}", "credentials"]
+                },
+                "description": "Generate temporary admin access credentials"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Plugins",
+          "item": [
+            {
+              "name": "List Plugins",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{api_key}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/client/sites/{{site_id}}/plugins?status=active",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "client", "sites", "{{site_id}}", "plugins"],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "active",
+                      "description": "Filter by status: active, inactive, or all"
+                    }
+                  ]
+                },
+                "description": "Get all plugins installed on a site"
+              },
+              "response": []
+            },
+            {
+              "name": "Install Plugin",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{api_key}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"install\",\n  \"source\": \"jetpack\",\n  \"activate\": true\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/client/sites/{{site_id}}/plugins",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "client", "sites", "{{site_id}}", "plugins"]
+                },
+                "description": "Install and optionally activate a plugin"
+              },
+              "response": []
+            },
+            {
+              "name": "Update All Plugins",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{api_key}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"update\",\n  \"plugin\": \"all\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/client/sites/{{site_id}}/plugins",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "client", "sites", "{{site_id}}", "plugins"]
+                },
+                "description": "Update all plugins on a site"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Themes",
+          "item": [
+            {
+              "name": "List Themes",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{api_key}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/client/sites/{{site_id}}/themes",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "client", "sites", "{{site_id}}", "themes"]
+                },
+                "description": "Get all themes installed on a site"
+              },
+              "response": []
+            },
+            {
+              "name": "Activate Theme",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{api_key}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"activate\",\n  \"theme\": \"twentytwentyfour\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/client/sites/{{site_id}}/themes",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "client", "sites", "{{site_id}}", "themes"]
+                },
+                "description": "Activate a theme on a site"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Users",
+          "item": [
+            {
+              "name": "List Users",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{api_key}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/client/sites/{{site_id}}/users",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "client", "sites", "{{site_id}}", "users"]
+                },
+                "description": "Get all users on a site"
+              },
+              "response": []
+            },
+            {
+              "name": "Create User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{api_key}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"create\",\n  \"username\": \"newuser\",\n  \"email\": \"user@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"role\": \"editor\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/client/sites/{{site_id}}/users",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "client", "sites", "{{site_id}}", "users"]
+                },
+                "description": "Create a new WordPress user"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "File Manager",
+          "item": [
+            {
+              "name": "List Files",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{api_key}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager?path=/",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "client", "sites", "{{site_id}}", "filemanager"],
+                  "query": [
+                    {
+                      "key": "path",
+                      "value": "/",
+                      "description": "Directory path to list"
+                    }
+                  ]
+                },
+                "description": "List files in a directory"
+              },
+              "response": []
+            },
+            {
+              "name": "Read File",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{api_key}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"read\",\n  \"path\": \"/wp-config.php\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "client", "sites", "{{site_id}}", "filemanager"]
+                },
+                "description": "Read file contents"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Application API",
+      "description": "Administrative API for managing PlyWP installation",
+      "item": [
+        {
+          "name": "Sites (Admin)",
+          "item": [
+            {
+              "name": "List All Sites",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{api_key}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/application/sites",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "application", "sites"]
+                },
+                "description": "Get all sites in the organization"
+              },
+              "response": []
+            },
+            {
+              "name": "Create Site",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{api_key}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"organizationId\": \"org_123\",\n  \"connectorId\": 1,\n  \"name\": \"New Site\",\n  \"domain\": \"newsite.com\",\n  \"diskLimitMb\": 1024,\n  \"phpVersion\": \"8.3\",\n  \"adminUser\": \"admin\",\n  \"adminPass\": \"StrongPassword123!\",\n  \"adminEmail\": \"admin@newsite.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/application/sites",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "application", "sites"]
+                },
+                "description": "Create a new WordPress site"
+              },
+              "response": []
+            },
+            {
+              "name": "Get Site",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{api_key}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/application/sites/{{site_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "application", "sites", "{{site_id}}"]
+                },
+                "description": "Get details of a specific site"
+              },
+              "response": []
+            },
+            {
+              "name": "Update Site",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{api_key}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Site Name\",\n  \"phpVersion\": \"8.3\",\n  \"diskLimitMb\": 2048\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/application/sites/{{site_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "application", "sites", "{{site_id}}"]
+                },
+                "description": "Update site configuration"
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Site",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{api_key}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/application/sites/{{site_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "application", "sites", "{{site_id}}"]
+                },
+                "description": "Delete a site and all its data"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Connectors",
+          "item": [
+            {
+              "name": "List Connectors",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{api_key}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/application/connectors",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "application", "connectors"]
+                },
+                "description": "Get all connector nodes"
+              },
+              "response": []
+            },
+            {
+              "name": "Create Connector",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{api_key}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"locationId\": 1,\n  \"serverIp\": \"192.168.1.10\",\n  \"fqdn\": \"node1.example.com\",\n  \"webServer\": \"nginx\",\n  \"dataDir\": \"/srv/plywp\",\n  \"autoSsl\": true,\n  \"daemonSslEnabled\": true,\n  \"dnsServerAddress\": \"127.0.0.1\",\n  \"dnsServerPort\": 53\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/application/connectors",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "application", "connectors"]
+                },
+                "description": "Register a new server node as a connector"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5173",
+      "description": "API base URL"
+    },
+    {
+      "key": "api_key",
+      "value": "your_api_key_here",
+      "description": "Your API key for authentication"
+    },
+    {
+      "key": "admin_token",
+      "value": "your_admin_token_here",
+      "description": "Admin authentication token"
+    },
+    {
+      "key": "site_id",
+      "value": "site_123",
+      "description": "Site identifier"
+    }
+  ]
+}

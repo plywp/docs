@@ -1,0 +1,455 @@
+import { Breadcrumb } from '@/components/Breadcrumb';
+import { TableOfContents } from '@/components/TableOfContents';
+import { CodeBlock } from '@/components/CodeBlock';
+import { Card } from '@/components/ui/card';
+
+export const metadata = {
+  title: 'API Authentication - PlyWP Documentation',
+  description: 'Detailed guide on authenticating with the PlyWP API.',
+};
+
+<Breadcrumb />
+
+<div className="grid md:grid-cols-[1fr_300px] gap-8">
+<div className="prose">
+
+# API Authentication
+
+The PlyWP API uses token-based authentication to secure access to resources. This guide covers all authentication methods and best practices.
+
+## Authentication Methods
+
+### Bearer Token Authentication
+
+The primary authentication method uses Bearer tokens in the Authorization header.
+
+**Basic Usage:**
+
+```bash
+curl -H "Authorization: Bearer YOUR_API_TOKEN" \
+  http://localhost:8081/api/v1/sites
+```
+
+### Generating Tokens
+
+#### Method 1: Login Endpoint
+
+Generate a temporary token using credentials:
+
+```bash
+curl -X POST http://localhost:8081/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "admin@example.com",
+    "password": "your-password"
+  }'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "expires_in": 604800,
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+Token expires in 7 days. Use the refresh token to get a new token:
+
+```bash
+curl -X POST http://localhost:8081/api/v1/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refresh_token": "YOUR_REFRESH_TOKEN"
+  }'
+```
+
+#### Method 2: Generate API Key
+
+For long-lived access, generate a persistent API key:
+
+```bash
+curl -X POST http://localhost:8081/api/v1/keys \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "CI/CD Pipeline",
+    "expires_in": 31536000
+  }'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "key_abc123",
+    "key": "plywp_live_abc123xyz...",
+    "created_at": "2024-01-15T10:30:00Z",
+    "expires_at": "2025-01-15T10:30:00Z"
+  }
+}
+```
+
+### Basic Authentication
+
+For simple scripts, you can use basic authentication with username and password:
+
+```bash
+curl -u "username:password" http://localhost:8081/api/v1/sites
+```
+
+## Token Types
+
+### Access Tokens
+
+Short-lived tokens for API access. Expire after 7 days by default.
+
+**Usage:**
+
+```bash
+curl -H "Authorization: Bearer ACCESS_TOKEN" \
+  http://localhost:8081/api/v1/sites
+```
+
+### Refresh Tokens
+
+Long-lived tokens used to obtain new access tokens without re-authenticating.
+
+**Usage:**
+
+```bash
+curl -X POST http://localhost:8081/api/v1/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refresh_token": "REFRESH_TOKEN"
+  }'
+```
+
+### API Keys
+
+Persistent tokens that don't expire (or expire far in the future). Use for services that need permanent access.
+
+**Usage:**
+
+```bash
+curl -H "Authorization: Bearer API_KEY" \
+  http://localhost:8081/api/v1/sites
+```
+
+## Managing API Keys
+
+### List API Keys
+
+```bash
+curl http://localhost:8081/api/v1/keys \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "key_abc123",
+      "name": "CI/CD Pipeline",
+      "created_at": "2024-01-15T10:30:00Z",
+      "expires_at": "2025-01-15T10:30:00Z",
+      "last_used_at": "2024-01-20T14:22:00Z"
+    }
+  ]
+}
+```
+
+### Revoke API Key
+
+Immediately disable an API key:
+
+```bash
+curl -X DELETE http://localhost:8081/api/v1/keys/key_abc123 \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+### Update API Key
+
+Modify API key details:
+
+```bash
+curl -X PUT http://localhost:8081/api/v1/keys/key_abc123 \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Pipeline Name"
+  }'
+```
+
+## Security Best Practices
+
+### Never Expose Tokens
+
+- Never commit tokens to version control
+- Never include tokens in client-side code
+- Never log tokens to console or files
+- Always use environment variables
+
+### Environment Variables
+
+Store tokens in environment variables:
+
+```bash
+export PLYWP_API_TOKEN="plywp_live_abc123..."
+```
+
+Use in scripts:
+
+```bash
+curl http://localhost:8081/api/v1/sites \
+  -H "Authorization: Bearer $PLYWP_API_TOKEN"
+```
+
+### Token Rotation
+
+Regularly rotate API keys and tokens:
+
+1. Generate a new key
+2. Update your applications to use the new key
+3. Revoke the old key
+
+### Scope Limitations
+
+Create API keys with limited scope when possible:
+
+```bash
+curl -X POST http://localhost:8081/api/v1/keys \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Read-Only Key",
+    "scopes": ["sites:read"],
+    "expires_in": 31536000
+  }'
+```
+
+## Error Handling
+
+### Invalid Token
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_TOKEN",
+    "message": "The provided token is invalid or expired"
+  }
+}
+```
+
+### Missing Authorization
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "MISSING_AUTHORIZATION",
+    "message": "Authorization header is required"
+  }
+}
+```
+
+### Insufficient Permissions
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "INSUFFICIENT_PERMISSIONS",
+    "message": "Your token does not have permission for this action"
+  }
+}
+```
+
+## Implementation Examples
+
+### JavaScript/Node.js
+
+```javascript
+const axios = require('axios');
+
+const client = axios.create({
+  baseURL: 'http://localhost:8081/api/v1',
+  headers: {
+    'Authorization': `Bearer ${process.env.PLYWP_API_TOKEN}`
+  }
+});
+
+// Get sites
+const response = await client.get('/sites');
+console.log(response.data);
+```
+
+With token refresh:
+
+```javascript
+const api = axios.create({
+  baseURL: 'http://localhost:8081/api/v1'
+});
+
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+api.interceptors.response.use(
+  response => response,
+  async error => {
+    if (error.response.status === 401) {
+      const refreshToken = localStorage.getItem('refreshToken');
+      const response = await axios.post(
+        'http://localhost:8081/api/v1/auth/refresh',
+        { refresh_token: refreshToken }
+      );
+      
+      localStorage.setItem('accessToken', response.data.data.token);
+      api.defaults.headers.Authorization = `Bearer ${response.data.data.token}`;
+      return api(error.config);
+    }
+    return Promise.reject(error);
+  }
+);
+```
+
+### Python
+
+```python
+import requests
+from datetime import datetime, timedelta
+
+class PlywpClient:
+    def __init__(self, base_url, username, password):
+        self.base_url = base_url
+        self.username = username
+        self.password = password
+        self.token = None
+        self.token_expires = None
+        self.session = requests.Session()
+    
+    def authenticate(self):
+        """Get an access token"""
+        response = requests.post(
+            f'{self.base_url}/api/v1/auth/login',
+            json={
+                'username': self.username,
+                'password': self.password
+            }
+        )
+        
+        data = response.json()['data']
+        self.token = data['token']
+        self.token_expires = datetime.now() + timedelta(
+            seconds=data['expires_in']
+        )
+        
+        self.session.headers.update({
+            'Authorization': f'Bearer {self.token}'
+        })
+    
+    def get(self, endpoint):
+        """Make authenticated GET request"""
+        if not self.token or datetime.now() > self.token_expires:
+            self.authenticate()
+        
+        return self.session.get(f'{self.base_url}/api/v1{endpoint}')
+
+# Usage
+client = PlywpClient(
+    'http://localhost:8081',
+    'admin@example.com',
+    'password'
+)
+
+sites = client.get('/sites')
+print(sites.json())
+```
+
+### Go
+
+```go
+package main
+
+import (
+    "fmt"
+    "net/http"
+    "os"
+)
+
+func main() {
+    token := os.Getenv("PLYWP_API_TOKEN")
+    
+    req, err := http.NewRequest("GET", 
+        "http://localhost:8081/api/v1/sites", nil)
+    if err != nil {
+        panic(err)
+    }
+    
+    req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+    
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+        panic(err)
+    }
+    defer resp.Body.Close()
+    
+    // Handle response
+}
+```
+
+## Common Patterns
+
+### Service Account
+
+For CI/CD pipelines and automated services:
+
+1. Create an API key specifically for the service
+2. Store it in a secure secret manager (GitHub Secrets, CircleCI Secrets, etc.)
+3. Use environment variables in your pipeline
+4. Regularly rotate the key
+
+### Multi-Tenant Access
+
+For applications serving multiple customers:
+
+1. Create separate API keys per customer
+2. Scope keys to customer-specific resources
+3. Implement API key management UI
+4. Monitor key usage and access patterns
+
+### Mobile Apps
+
+For mobile applications:
+
+1. Use temporary tokens obtained via OAuth or similar
+2. Implement token refresh on the client
+3. Store tokens securely (Keychain on iOS, Keystore on Android)
+4. Never store refresh tokens on the client if possible
+
+## Next Steps
+
+- Read [API Overview](/docs/api/overview)
+- Check [Plyorde Endpoints](/docs/api/plyorde/endpoints)
+- Review [Security Guide](/docs/guides/security)
+
+</div>
+
+<TableOfContents />
+</div>

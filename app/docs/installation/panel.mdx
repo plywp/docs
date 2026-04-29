@@ -1,0 +1,344 @@
+import { Breadcrumb } from '@/components/Breadcrumb';
+import { TableOfContents } from '@/components/TableOfContents';
+import { CodeBlock } from '@/components/CodeBlock';
+import { Card } from '@/components/ui/card';
+
+export const metadata = {
+  title: 'PlyWP Panel Installation - PlyWP Documentation',
+  description: 'Complete installation guide for PlyWP Panel control panel.',
+};
+
+<Breadcrumb />
+
+<div className="grid md:grid-cols-[1fr_300px] gap-8">
+<div className="prose">
+
+# PlyWP Panel Installation
+
+PlyWP Panel is the web control interface for managing WordPress installations. This guide walks you through the installation process on various environments.
+
+## Prerequisites
+
+Before installing Panel, ensure you have:
+
+- **Node.js 14+** or higher installed
+- **npm**, **yarn**, or **pnpm** package manager
+- **Git** for cloning the repository (optional)
+- At least **2GB RAM** available
+- Sufficient disk space (500MB minimum)
+- Network connectivity for downloading dependencies
+
+## Quick Start
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/plywp/panel.git
+cd panel
+```
+
+If you prefer not to use Git, you can download the repository as a ZIP file from [GitHub](https://github.com/plywp/panel).
+
+### 2. Install Dependencies
+
+```bash
+# Using npm
+npm install
+
+# Or using pnpm (recommended)
+pnpm install
+
+# Or using yarn
+yarn install
+```
+
+### 3. Configure Environment
+
+Create a `.env.local` file in the project root:
+
+```bash
+cp .env.example .env.local
+```
+
+Edit the file with your configuration:
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:8081
+DATABASE_URL=postgresql://user:password@localhost:5432/plywp
+JWT_SECRET=your-secure-secret-key-here
+```
+
+### 4. Build the Application
+
+```bash
+npm run build
+```
+
+### 5. Start the Server
+
+**Development:**
+```bash
+npm run dev
+```
+
+**Production:**
+```bash
+npm run start
+```
+
+The Panel will be available at `http://localhost:3000`
+
+## Detailed Installation
+
+### System Setup
+
+#### On Debian/Ubuntu
+
+```bash
+# Update package manager
+sudo apt update
+sudo apt upgrade -y
+
+# Install Node.js (if not already installed)
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Verify installation
+node --version
+npm --version
+```
+
+#### On CentOS/RHEL
+
+```bash
+# Update package manager
+sudo yum update -y
+
+# Install Node.js
+curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+sudo yum install -y nodejs
+
+# Verify installation
+node --version
+npm --version
+```
+
+### Panel Installation
+
+#### Step 1: Create Installation Directory
+
+```bash
+# Create directory for PlyWP
+sudo mkdir -p /opt/plywp/panel
+cd /opt/plywp/panel
+
+# Give your user ownership
+sudo chown -R $USER:$USER /opt/plywp
+```
+
+#### Step 2: Clone Repository
+
+```bash
+git clone https://github.com/plywp/panel.git .
+```
+
+#### Step 3: Install Dependencies
+
+```bash
+npm install --production
+# or
+pnpm install --prod
+```
+
+#### Step 4: Configuration
+
+Create `.env.local` with required settings:
+
+```
+# Panel Configuration
+NEXT_PUBLIC_APP_NAME=PlyWP
+NEXT_PUBLIC_API_URL=http://localhost:8081
+
+# Database
+DATABASE_URL=postgresql://plywp:secure_password@localhost:5432/plywp
+
+# Authentication
+JWT_SECRET=generate-a-secure-random-string-here
+JWT_EXPIRES_IN=7d
+
+# API Configuration
+API_TIMEOUT=30000
+
+# Security
+CORS_ORIGINS=http://localhost:3000,https://yourdomain.com
+```
+
+#### Step 5: Database Setup
+
+The Panel uses a PostgreSQL database. Set it up:
+
+```bash
+# Create database and user
+sudo -u postgres psql <<EOF
+CREATE USER plywp WITH PASSWORD 'secure_password';
+CREATE DATABASE plywp OWNER plywp;
+GRANT ALL PRIVILEGES ON DATABASE plywp TO plywp;
+EOF
+
+# Run migrations
+npx prisma migrate deploy
+```
+
+#### Step 6: Build for Production
+
+```bash
+npm run build
+```
+
+### Running Panel
+
+#### Development Mode
+
+```bash
+npm run dev
+```
+
+Access at: `http://localhost:3000`
+
+#### Production Mode
+
+For production deployment, use a process manager like PM2:
+
+```bash
+# Install PM2 globally
+npm install -g pm2
+
+# Start application
+pm2 start npm --name "plywp-panel" -- start
+
+# Make it start on boot
+pm2 startup
+pm2 save
+```
+
+Access at: `http://your-server-ip:3000` (configure with reverse proxy for HTTPS)
+
+## Reverse Proxy Configuration
+
+For production, configure a reverse proxy (nginx or Apache):
+
+### Nginx Configuration
+
+```nginx
+server {
+    listen 80;
+    server_name plywp.example.com;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Enable the configuration:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/plywp /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+## Verification
+
+After installation, verify everything is working:
+
+```bash
+# Check if service is running
+curl http://localhost:3000
+
+# Check logs (if using PM2)
+pm2 logs plywp-panel
+```
+
+## Environment Variables
+
+### Required
+
+- `DATABASE_URL`: PostgreSQL connection string
+- `JWT_SECRET`: Secret key for JWT signing
+- `NEXT_PUBLIC_API_URL`: URL for backend API
+
+### Optional
+
+- `JWT_EXPIRES_IN`: JWT expiration time (default: 7d)
+- `API_TIMEOUT`: API request timeout in ms (default: 30000)
+- `LOG_LEVEL`: Logging level (debug, info, warn, error)
+- `CORS_ORIGINS`: Comma-separated list of allowed origins
+
+## Troubleshooting
+
+### Port Already in Use
+
+If port 3000 is already in use:
+
+```bash
+# Find process using the port
+sudo lsof -i :3000
+
+# Change port in .env
+NEXT_PUBLIC_PORT=3001
+```
+
+### Database Connection Issues
+
+```bash
+# Test PostgreSQL connection
+psql -h localhost -U plywp -d plywp
+
+# Check if service is running
+sudo systemctl status postgresql
+```
+
+### Module Not Found Errors
+
+```bash
+# Clear node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Permission Denied Errors
+
+```bash
+# Fix permissions
+sudo chown -R $USER:$USER /opt/plywp
+chmod -R 755 /opt/plywp
+```
+
+## Next Steps
+
+1. Access Panel at `http://localhost:3000`
+2. Log in with default credentials (if provided)
+3. Configure Panel settings
+4. Add WordPress sites
+5. Review [Security Guide](/docs/guides/security) for best practices
+6. Check [API Documentation](/docs/api/overview) for integrations
+
+## Getting Help
+
+- Check [GitHub Issues](https://github.com/plywp/panel/issues)
+- Review [Architecture Guide](/docs/guides/architecture)
+- See [FAQ](#) section
+
+</div>
+
+<TableOfContents />
+</div>

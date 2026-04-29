@@ -1,0 +1,521 @@
+import { Breadcrumb } from '@/components/Breadcrumb';
+import { TableOfContents } from '@/components/TableOfContents';
+import { CodeBlock } from '@/components/CodeBlock';
+
+export const metadata = {
+  title: 'Deployment Guide - PlyWP Documentation',
+  description: 'Production deployment strategies and best practices for PlyWP.',
+};
+
+<Breadcrumb />
+
+<div className="grid md:grid-cols-[1fr_300px] gap-8">
+<div className="prose">
+
+# Deployment Guide
+
+This guide covers production deployment strategies, best practices, and architecture patterns for PlyWP.
+
+## Pre-Deployment Checklist
+
+Before deploying to production:
+
+- [ ] SSL/TLS certificates obtained and configured
+- [ ] PostgreSQL database set up and tested
+- [ ] Backup storage configured and tested
+- [ ] Firewall rules configured
+- [ ] Domain names registered and configured
+- [ ] Monitoring and logging set up
+- [ ] Load balancing configured (if needed)
+- [ ] Disaster recovery plan documented
+- [ ] Security review completed
+- [ ] Performance testing done
+
+## Single Server Deployment
+
+For small to medium deployments, run all components on a single server.
+
+### Architecture
+
+```
+Single Server
+├── Panel (Node.js)
+├── Plyorde (Go)
+├── PostgreSQL
+├── Nginx (Reverse Proxy)
+└── Certbot (SSL)
+```
+
+### Server Requirements
+
+- **CPU**: 2+ cores
+- **RAM**: 4GB+ (8GB recommended)
+- **Storage**: 100GB+ (depends on backup needs)
+- **Network**: Stable, redundant connectivity
+- **OS**: Ubuntu 20.04 LTS+ or Debian 11+
+
+### Setup Steps
+
+1. **Provision Server**
+   ```bash
+   # Get server IP and SSH access
+   # Update system
+   sudo apt update && sudo apt upgrade -y
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   # See installation guides for detailed steps
+   # - Install Node.js
+   # - Install Go
+   # - Install PostgreSQL
+   # - Install Nginx
+   ```
+
+3. **Deploy Panel**
+   ```bash
+   # Clone repository
+   git clone https://github.com/plywp/panel.git /opt/plywp/panel
+   cd /opt/plywp/panel
+   
+   # Install and build
+   npm install
+   npm run build
+   
+   # Create systemd service
+   # See installation guide for service configuration
+   ```
+
+4. **Deploy Plyorde**
+   ```bash
+   # Clone repository
+   git clone https://github.com/plywp/plyorde.git /opt/plywp/plyorde
+   cd /opt/plywp/plyorde
+   
+   # Build
+   go build -o /usr/local/bin/plyorde ./cmd/plyorde
+   
+   # Configure and start service
+   # See installation guide for service configuration
+   ```
+
+5. **Configure Reverse Proxy**
+   ```nginx
+   # Nginx configuration routes requests to Panel and Plyorde
+   # See installation guides for complete configuration
+   ```
+
+6. **Enable HTTPS**
+   ```bash
+   sudo certbot certonly --nginx -d plywp.example.com
+   ```
+
+### Monitoring
+
+Set up monitoring for:
+- CPU and memory usage
+- Disk usage and I/O
+- Network bandwidth
+- Process health (Panel, Plyorde, PostgreSQL)
+- API response times
+- Error rates
+
+## Multi-Server Deployment
+
+For larger deployments, distribute components across multiple servers.
+
+### Architecture
+
+```
+Load Balancer (Nginx)
+    │
+    ├─ Panel Server 1 (Port 3000)
+    ├─ Panel Server 2 (Port 3000)
+    └─ Panel Server 3 (Port 3000)
+
+Plyorde Servers (Per-host or distributed)
+    ├─ Plyorde Server 1 (Port 8081)
+    ├─ Plyorde Server 2 (Port 8081)
+    └─ Plyorde Server 3 (Port 8081)
+
+Shared PostgreSQL
+    └─ Primary + Standby (Streaming Replication)
+
+Shared Backup Storage
+    └─ S3 or NFS
+```
+
+### Panel Load Balancing
+
+Configure load balancer for Panel:
+
+```nginx
+upstream panel_backend {
+    server panel1.internal:3000;
+    server panel2.internal:3000;
+    server panel3.internal:3000;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name plywp.example.com;
+
+    location / {
+        proxy_pass http://panel_backend;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+```
+
+### Plyorde Distribution
+
+Strategy options:
+
+1. **Per-Server Plyorde**
+   - One Plyorde instance per physical server
+   - Manages WordPress sites on that server
+   - Panel routes requests based on site location
+
+2. **Distributed Plyorde**
+   - Multiple Plyorde instances serve same sites
+   - Load balanced across instances
+   - Requires shared database access
+
+3. **Cluster Plyorde**
+   - Plyorde instances in a cluster
+   - High availability and failover
+   - Requires coordination mechanism
+
+### Database Setup
+
+PostgreSQL with streaming replication:
+
+```bash
+# Primary server
+sudo -u postgres createdb plywp
+sudo -u postgres createuser plywp
+
+# Standby server - configure replication
+# From primary postgresql.conf:
+wal_level = replica
+max_wal_senders = 3
+wal_keep_segments = 64
+```
+
+### Backup Storage
+
+Configure S3 for backups:
+
+```bash
+# AWS credentials
+export AWS_ACCESS_KEY_ID="your-key"
+export AWS_SECRET_ACCESS_KEY="your-secret"
+export AWS_DEFAULT_REGION="us-east-1"
+
+# Plyorde configuration
+backup:
+  storage: s3
+  s3:
+    bucket: "plywp-backups"
+    prefix: "backups/"
+```
+
+## Docker Deployment
+
+Deploy using Docker and Docker Compose.
+
+### Docker Compose Stack
+
+See installation guides for complete Docker Compose example.
+
+### Scaling with Docker Swarm
+
+```bash
+# Initialize Swarm
+docker swarm init
+
+# Deploy stack
+docker stack deploy -c docker-compose.yml plywp
+
+# Scale Panel
+docker service scale plywp_panel=3
+```
+
+### Kubernetes Deployment
+
+For advanced deployments using Kubernetes:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: plywp-panel
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 3000
+  selector:
+    app: plywp-panel
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plywp-panel
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: plywp-panel
+  template:
+    metadata:
+      labels:
+        app: plywp-panel
+    spec:
+      containers:
+      - name: panel
+        image: plywp/panel:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: plywp-secrets
+              key: database-url
+```
+
+## SSL/TLS Configuration
+
+### Self-Signed Certificates
+
+For development/testing:
+
+```bash
+# Generate certificate
+openssl req -x509 -newkey rsa:4096 \
+  -keyout server.key -out server.crt \
+  -days 365 -nodes
+
+# Configure in Panel/.env
+NEXTAUTH_URL=https://localhost:3000
+```
+
+### Let's Encrypt
+
+For production:
+
+```bash
+# Certbot auto-renewal
+sudo certbot renew --dry-run
+
+# Add to crontab
+0 3 * * * /usr/bin/certbot renew --quiet
+```
+
+## Performance Tuning
+
+### Panel Optimization
+
+1. **Build Optimization**
+   ```bash
+   npm run build
+   # Use production build
+   ```
+
+2. **Node.js Tuning**
+   ```bash
+   NODE_ENV=production
+   NODE_OPTIONS="--max-old-space-size=2048"
+   ```
+
+3. **Caching**
+   - Enable CDN for static assets
+   - Use Redis for session caching
+   - Implement API response caching
+
+### Plyorde Optimization
+
+1. **Database Connection Pooling**
+   ```yaml
+   database:
+     max_connections: 25
+     connection_timeout: 5s
+   ```
+
+2. **Request Timeouts**
+   ```yaml
+   api:
+     request_timeout: 30s
+     read_timeout: 10s
+     write_timeout: 10s
+   ```
+
+3. **Goroutine Limits**
+   ```go
+   runtime.GOMAXPROCS(4) // Adjust based on CPU cores
+   ```
+
+## Disaster Recovery
+
+### Backup Strategy
+
+1. **Full Backups**
+   - Weekly full backups
+   - Retained for 30 days
+   - Off-site storage
+
+2. **Incremental Backups**
+   - Daily incremental backups
+   - 7-day retention
+   - Quick recovery point
+
+3. **Configuration Backups**
+   - Daily backups of Panel config
+   - Plyorde configuration files
+   - Nginx/Reverse proxy config
+
+### Restore Procedures
+
+1. **Database Restore**
+   ```bash
+   # Restore PostgreSQL database
+   pg_restore -d plywp /backups/plywp_backup.dump
+   ```
+
+2. **Site Restore**
+   ```bash
+   # Use Plyorde API to restore from backup
+   curl -X POST \
+     http://localhost:8081/api/v1/sites/{id}/backups/{backup_id}/restore \
+     -H "Authorization: Bearer TOKEN"
+   ```
+
+3. **Full System Recovery**
+   - Redeploy infrastructure
+   - Restore database
+   - Restore Panel configuration
+   - Restore Plyorde configuration
+   - Verify all services running
+
+### RTO & RPO Targets
+
+- **RTO (Recovery Time Objective)**: 2 hours
+- **RPO (Recovery Point Objective)**: 1 hour
+
+## Monitoring & Alerting
+
+### Metrics to Monitor
+
+1. **System Metrics**
+   - CPU usage
+   - Memory usage
+   - Disk usage
+   - Network I/O
+
+2. **Application Metrics**
+   - API response time
+   - Error rates
+   - Request throughput
+   - Database query time
+
+3. **Business Metrics**
+   - Uptime percentage
+   - Backup success rate
+   - Number of sites managed
+   - User activity
+
+### Monitoring Tools
+
+**Prometheus + Grafana**
+
+```yaml
+# prometheus.yml
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'plyorde'
+    static_configs:
+      - targets: ['localhost:8081']
+  
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
+```
+
+**Alert Rules**
+
+```yaml
+groups:
+  - name: plywp
+    rules:
+      - alert: HighMemoryUsage
+        expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.1
+        for: 5m
+
+      - alert: APIErrorRateHigh
+        expr: rate(api_errors_total[5m]) > 0.05
+        for: 5m
+
+      - alert: PlyordeDown
+        expr: up{job="plyorde"} == 0
+        for: 1m
+```
+
+## Logging
+
+### Log Aggregation
+
+Use centralized logging:
+
+```bash
+# Filebeat configuration
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /var/log/plywp/panel.log
+    - /var/log/plywp/plyorde.log
+
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+```
+
+### Log Levels
+
+- **DEBUG**: Detailed debug information
+- **INFO**: General information
+- **WARN**: Warning messages (recoverable)
+- **ERROR**: Error messages (needs attention)
+- **CRITICAL**: Critical errors (immediate action needed)
+
+## Security Deployment
+
+### Firewall Rules
+
+```bash
+# Allow HTTPS
+sudo ufw allow 443/tcp
+
+# Allow SSH (from restricted IPs only)
+sudo ufw allow 22/tcp
+
+# Allow Plyorde (internal only)
+sudo ufw allow from 10.0.0.0/8 to any port 8081
+```
+
+### SELinux/AppArmor
+
+Enable and configure security modules for additional protection.
+
+## Next Steps
+
+- Read [Security Guide](/docs/guides/security)
+- Review [Architecture Guide](/docs/guides/architecture)
+- Check [Monitoring Best Practices](/docs)
+
+</div>
+
+<TableOfContents />
+</div>

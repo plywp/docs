@@ -1,0 +1,475 @@
+import { Breadcrumb } from '@/components/Breadcrumb';
+import { TableOfContents } from '@/components/TableOfContents';
+import { CodeBlock } from '@/components/CodeBlock';
+import { Card } from '@/components/ui/card';
+
+export const metadata = {
+  title: 'Plyorde Daemon Installation - PlyWP Documentation',
+  description: 'Complete installation guide for Plyorde daemon service.',
+};
+
+<Breadcrumb />
+
+<div className="grid md:grid-cols-[1fr_300px] gap-8">
+<div className="prose">
+
+# Plyorde Daemon Installation
+
+Plyorde is the core daemon service that powers PlyWP functionality. It handles WordPress management operations, task execution, and service coordination.
+
+## Prerequisites
+
+Before installing Plyorde, ensure you have:
+
+- **Go 1.18+** installed and configured
+- **Git** for cloning the repository
+- Linux operating system (Ubuntu, Debian, CentOS, etc.)
+- At least **1GB RAM** available
+- Sufficient disk space (200MB minimum)
+- Network connectivity for downloading dependencies
+- Root or sudo access for system-level installation
+
+## Quick Start
+
+### 1. Install Go (if needed)
+
+```bash
+# Download and install Go
+wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
+
+# Add Go to PATH
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+source ~/.bashrc
+
+# Verify installation
+go version
+```
+
+### 2. Clone Repository
+
+```bash
+git clone https://github.com/plywp/plyorde.git
+cd plyorde
+```
+
+### 3. Build Plyorde
+
+```bash
+go build -o plyorde ./cmd/plyorde
+```
+
+### 4. Install as Service
+
+```bash
+# Copy binary to system directory
+sudo cp plyorde /usr/local/bin/
+
+# Create configuration directory
+sudo mkdir -p /etc/plyorde
+
+# Copy default configuration
+sudo cp config.example.yml /etc/plyorde/config.yml
+
+# Create data directory
+sudo mkdir -p /var/lib/plyorde
+sudo chown plyorde:plyorde /var/lib/plyorde
+```
+
+### 5. Start Service
+
+```bash
+# Start the service
+sudo systemctl start plyorde
+
+# Enable on boot
+sudo systemctl enable plyorde
+
+# Check status
+sudo systemctl status plyorde
+```
+
+Plyorde will be available at `http://localhost:8081`
+
+## Detailed Installation
+
+### System Setup
+
+#### Create Service User
+
+```bash
+# Create dedicated user for Plyorde
+sudo useradd -r -s /bin/false plyorde
+
+# Create directories
+sudo mkdir -p /opt/plyorde
+sudo mkdir -p /var/log/plyorde
+sudo mkdir -p /var/lib/plyorde
+
+# Set permissions
+sudo chown -R plyorde:plyorde /opt/plyorde
+sudo chown -R plyorde:plyorde /var/log/plyorde
+sudo chown -R plyorde:plyorde /var/lib/plyorde
+```
+
+#### On Debian/Ubuntu
+
+```bash
+# Update package manager
+sudo apt update
+sudo apt upgrade -y
+
+# Install dependencies
+sudo apt install -y git build-essential
+
+# Install Go
+sudo wget -q https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+source ~/.bashrc
+
+# Verify
+go version
+```
+
+#### On CentOS/RHEL
+
+```bash
+# Update package manager
+sudo yum update -y
+
+# Install dependencies
+sudo yum groupinstall -y "Development Tools"
+sudo yum install -y git
+
+# Install Go
+wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+source ~/.bashrc
+
+# Verify
+go version
+```
+
+### Plyorde Installation
+
+#### Step 1: Clone Repository
+
+```bash
+cd /opt
+sudo git clone https://github.com/plywp/plyorde.git
+cd plyorde
+sudo chown -R $USER:$USER .
+```
+
+#### Step 2: Install Dependencies
+
+```bash
+go mod download
+go mod verify
+```
+
+#### Step 3: Configure
+
+Create configuration file:
+
+```bash
+sudo nano /etc/plyorde/config.yml
+```
+
+Basic configuration:
+
+```yaml
+# Plyorde Configuration
+
+# Server
+server:
+  port: 8081
+  host: 0.0.0.0
+  tls: false
+  # For HTTPS:
+  # tls: true
+  # cert: /etc/plyorde/certs/server.crt
+  # key: /etc/plyorde/certs/server.key
+
+# Logging
+logging:
+  level: info
+  format: json
+  output: file
+  file: /var/log/plyorde/plyorde.log
+
+# Database
+database:
+  type: sqlite
+  # For SQLite (default)
+  path: /var/lib/plyorde/plyorde.db
+  
+  # For PostgreSQL:
+  # type: postgres
+  # connection: postgresql://user:pass@localhost/plyorde
+
+# WordPress
+wordpress:
+  paths:
+    - /var/www/html
+    - /home/*/public_html
+
+# Security
+security:
+  api_key_required: true
+  enable_cors: true
+  cors_origins:
+    - http://localhost:3000
+    - http://localhost:8080
+```
+
+#### Step 4: Build Plyorde
+
+```bash
+cd /opt/plyorde
+go build -o /opt/plyorde/plyorde ./cmd/plyorde
+```
+
+#### Step 5: Create Systemd Service
+
+```bash
+sudo tee /etc/systemd/system/plyorde.service > /dev/null <<EOF
+[Unit]
+Description=Plyorde WordPress Daemon
+After=network.target
+
+[Service]
+Type=simple
+User=plyorde
+WorkingDirectory=/opt/plyorde
+ExecStart=/opt/plyorde/plyorde -config /etc/plyorde/config.yml
+Restart=on-failure
+RestartSec=5
+
+# Security
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/plyorde /var/log/plyorde
+
+# Resource limits
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+Reload systemd:
+
+```bash
+sudo systemctl daemon-reload
+```
+
+### Running Plyorde
+
+#### Start Service
+
+```bash
+# Start the service
+sudo systemctl start plyorde
+
+# Check status
+sudo systemctl status plyorde
+
+# View logs
+sudo journalctl -u plyorde -f
+
+# Enable on boot
+sudo systemctl enable plyorde
+```
+
+#### Verify Installation
+
+```bash
+# Check if service is listening
+sudo netstat -tlnp | grep 8081
+
+# Test API
+curl http://localhost:8081/health
+
+# Check logs
+sudo tail -f /var/log/plyorde/plyorde.log
+```
+
+## Configuration Options
+
+### Server Settings
+
+```yaml
+server:
+  port: 8081                    # Port to listen on
+  host: 0.0.0.0                # Host to bind to
+  tls: false                    # Enable TLS
+  max_request_size: 104857600  # Max request size (100MB)
+```
+
+### Database Settings
+
+```yaml
+database:
+  # SQLite (default)
+  type: sqlite
+  path: /var/lib/plyorde/plyorde.db
+  
+  # PostgreSQL
+  type: postgres
+  connection: postgresql://user:pass@host/db
+  max_connections: 25
+```
+
+### WordPress Detection
+
+```yaml
+wordpress:
+  paths:
+    - /var/www/html              # Default installation path
+    - /home/*/public_html         # User directories
+    - /opt/wordpress              # Custom paths
+```
+
+### Security
+
+```yaml
+security:
+  api_key_required: true         # Require API key
+  enable_cors: true              # Enable CORS
+  cors_origins:                  # Allowed origins
+    - http://localhost:3000
+  rate_limit: 100                # Requests per minute
+```
+
+## Advanced Configuration
+
+### HTTPS/TLS
+
+Generate self-signed certificate:
+
+```bash
+sudo openssl req -x509 -newkey rsa:4096 -keyout /etc/plyorde/server.key -out /etc/plyorde/server.crt -days 365 -nodes
+```
+
+Update configuration:
+
+```yaml
+server:
+  tls: true
+  cert: /etc/plyorde/server.crt
+  key: /etc/plyorde/server.key
+```
+
+### PostgreSQL Database
+
+Setup PostgreSQL:
+
+```bash
+# Install PostgreSQL
+sudo apt install postgresql postgresql-contrib
+
+# Create database and user
+sudo -u postgres psql <<EOF
+CREATE USER plyorde WITH PASSWORD 'secure_password';
+CREATE DATABASE plyorde OWNER plyorde;
+GRANT ALL PRIVILEGES ON DATABASE plyorde TO plyorde;
+EOF
+```
+
+Update configuration:
+
+```yaml
+database:
+  type: postgres
+  connection: postgresql://plyorde:secure_password@localhost:5432/plyorde
+```
+
+## Troubleshooting
+
+### Service Won't Start
+
+```bash
+# Check for errors
+sudo systemctl status plyorde
+sudo journalctl -u plyorde -n 50
+
+# Check permissions
+sudo ls -la /etc/plyorde/
+sudo ls -la /var/lib/plyorde/
+
+# Verify configuration
+/opt/plyorde/plyorde -config /etc/plyorde/config.yml -dry-run
+```
+
+### Port Already in Use
+
+```bash
+# Find process using port 8081
+sudo lsof -i :8081
+
+# Kill process or change port in config
+```
+
+### Database Issues
+
+```bash
+# For SQLite
+sudo chown plyorde:plyorde /var/lib/plyorde/plyorde.db
+
+# For PostgreSQL - test connection
+psql -h localhost -U plyorde -d plyorde
+```
+
+### Permission Denied
+
+```bash
+# Fix permissions
+sudo chown -R plyorde:plyorde /etc/plyorde
+sudo chown -R plyorde:plyorde /var/lib/plyorde
+sudo chmod 750 /etc/plyorde
+sudo chmod 750 /var/lib/plyorde
+```
+
+## Updating Plyorde
+
+```bash
+# Stop service
+sudo systemctl stop plyorde
+
+# Backup database
+sudo cp /var/lib/plyorde/plyorde.db /var/lib/plyorde/plyorde.db.backup
+
+# Update repository
+cd /opt/plyorde
+git pull origin main
+
+# Rebuild
+go build -o /opt/plyorde/plyorde ./cmd/plyorde
+
+# Start service
+sudo systemctl start plyorde
+```
+
+## Next Steps
+
+1. Verify Plyorde is running
+2. Configure Panel to connect to Plyorde
+3. Add WordPress installations
+4. Review [Security Guide](/docs/guides/security)
+5. Check [API Documentation](/docs/api/overview)
+
+## Getting Help
+
+- Check [GitHub Issues](https://github.com/plywp/plyorde/issues)
+- Review [Architecture Guide](/docs/guides/architecture)
+- Visit [Documentation Home](/docs)
+
+</div>
+
+<TableOfContents />
+</div>

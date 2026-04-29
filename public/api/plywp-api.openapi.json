@@ -1,0 +1,564 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "PlyWP API",
+    "description": "Complete API for PlyWP Panel and Plyorde services",
+    "version": "1.0.0",
+    "contact": {
+      "name": "PlyWP Support",
+      "url": "https://github.com/plywp"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5173",
+      "description": "Local development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "apiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    },
+    "schemas": {
+      "Site": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "domain": { "type": "string" },
+          "status": { "type": "string", "enum": ["active", "inactive", "suspended"] },
+          "phpVersion": { "type": "string" },
+          "wordpressVersion": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Plugin": {
+        "type": "object",
+        "properties": {
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "version": { "type": "string" },
+          "status": { "type": "string", "enum": ["active", "inactive"] },
+          "author": { "type": "string" }
+        }
+      },
+      "Theme": {
+        "type": "object",
+        "properties": {
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "version": { "type": "string" },
+          "status": { "type": "string", "enum": ["active", "inactive"] },
+          "author": { "type": "string" }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "username": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "role": { "type": "string" },
+          "display_name": { "type": "string" }
+        }
+      },
+      "HealthStatus": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "enum": ["healthy", "warning", "critical"] },
+          "checks": {
+            "type": "object",
+            "properties": {
+              "database": { "type": "string" },
+              "wordpress": { "type": "string" },
+              "php": { "type": "string" },
+              "ssl": { "type": "string" }
+            }
+          },
+          "warnings": { "type": "array", "items": { "type": "string" } },
+          "uptime_percent": { "type": "number" }
+        }
+      },
+      "Credentials": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string" },
+          "password": { "type": "string" },
+          "expires_at": { "type": "string", "format": "date-time" },
+          "login_url": { "type": "string", "format": "uri" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/client/sites": {
+      "get": {
+        "summary": "List Sites",
+        "description": "Get all sites accessible to the authenticated user",
+        "tags": ["Client API", "Sites"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sites": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Site" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client/sites/{site_id}": {
+      "get": {
+        "summary": "Get Site Details",
+        "description": "Retrieve details for a specific site",
+        "tags": ["Client API", "Sites"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Site" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client/sites/{site_id}/health": {
+      "get": {
+        "summary": "Site Health",
+        "description": "Check the health status of a WordPress site",
+        "tags": ["Client API", "Sites"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HealthStatus" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client/sites/{site_id}/credentials": {
+      "post": {
+        "summary": "Get Admin Credentials",
+        "description": "Generate temporary admin access credentials",
+        "tags": ["Client API", "Sites"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Credentials" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client/sites/{site_id}/plugins": {
+      "get": {
+        "summary": "List Plugins",
+        "description": "Get all plugins installed on a site",
+        "tags": ["Client API", "Plugins"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["active", "inactive", "all"] },
+            "description": "Filter by status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "plugins": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Plugin" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Manage Plugins",
+        "description": "Install, activate, deactivate, update, or delete plugins",
+        "tags": ["Client API", "Plugins"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": ["install", "activate", "deactivate", "update", "delete"]
+                  },
+                  "plugin": { "type": "string" },
+                  "source": { "type": "string" },
+                  "activate": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/client/sites/{site_id}/themes": {
+      "get": {
+        "summary": "List Themes",
+        "description": "Get all themes installed on a site",
+        "tags": ["Client API", "Themes"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "themes": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Theme" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Manage Themes",
+        "description": "Install, activate, or delete themes",
+        "tags": ["Client API", "Themes"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": { "type": "string", "enum": ["activate", "install", "delete"] },
+                  "theme": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/client/sites/{site_id}/users": {
+      "get": {
+        "summary": "List Users",
+        "description": "Get all users on a site",
+        "tags": ["Client API", "Users"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "users": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/User" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Manage Users",
+        "description": "Create, update, or delete WordPress users",
+        "tags": ["Client API", "Users"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": { "type": "string" },
+                  "username": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" },
+                  "role": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/application/sites": {
+      "get": {
+        "summary": "List All Sites",
+        "description": "Get all sites in the organization (admin only)",
+        "tags": ["Application API", "Sites"],
+        "security": [{ "bearerAuth": [] }, { "apiKey": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Site" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Site",
+        "description": "Create a new WordPress site (admin only)",
+        "tags": ["Application API", "Sites"],
+        "security": [{ "bearerAuth": [] }, { "apiKey": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "organizationId": { "type": "string" },
+                  "connectorId": { "type": "integer" },
+                  "name": { "type": "string" },
+                  "domain": { "type": "string" },
+                  "diskLimitMb": { "type": "integer" },
+                  "phpVersion": { "type": "string" },
+                  "adminUser": { "type": "string" },
+                  "adminPass": { "type": "string" },
+                  "adminEmail": { "type": "string", "format": "email" }
+                },
+                "required": ["organizationId", "connectorId", "name", "domain"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Site created successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Site" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/application/sites/{site_id}": {
+      "get": {
+        "summary": "Get Site",
+        "description": "Get details of a specific site (admin only)",
+        "tags": ["Application API", "Sites"],
+        "security": [{ "bearerAuth": [] }, { "apiKey": [] }],
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Site" }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update Site",
+        "description": "Modify site configuration (admin only)",
+        "tags": ["Application API", "Sites"],
+        "security": [{ "bearerAuth": [] }, { "apiKey": [] }],
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "phpVersion": { "type": "string" },
+                  "diskLimitMb": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Site updated successfully"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Site",
+        "description": "Remove a site and all its data (admin only)",
+        "tags": ["Application API", "Sites"],
+        "security": [{ "bearerAuth": [] }, { "apiKey": [] }],
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Site deleted successfully"
+          }
+        }
+      }
+    }
+  }
+}

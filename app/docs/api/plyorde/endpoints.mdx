@@ -1,0 +1,937 @@
+import { CodeBlock } from '@/components/CodeBlock';
+
+# PlyWP API Endpoints
+
+Complete reference for all available API endpoints across Client API and Application API, including real request/response examples from the actual Postman collections.
+
+## Overview
+
+PlyWP provides two main APIs:
+
+- **Client API**: For end-users to manage WordPress sites they have access to
+- **Application API**: For administrators to manage the entire PlyWP installation
+
+---
+
+## Client API
+
+The Client API is designed for users and third-party integrations to manage WordPress sites. All requests require Bearer token authentication.
+
+**Base URL:** `http://localhost:5173/api/client`
+
+**Authentication:**
+```
+Authorization: Bearer {api_key}
+```
+
+### Sites Management
+
+#### List Accessible Sites
+
+Get all WordPress sites the authenticated user has access to.
+
+```
+GET /sites
+```
+
+**Response Example:**
+```json
+{
+  "sites": [
+    {
+      "id": "site_123",
+      "name": "My WordPress Site",
+      "domain": "example.com",
+      "status": "active",
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+#### Get Site Details
+
+Retrieve comprehensive information about a specific site.
+
+```
+GET /sites/{site_id}
+```
+
+**Response Example:**
+```json
+{
+  "id": "site_123",
+  "name": "My WordPress Site",
+  "domain": "example.com",
+  "status": "active",
+  "phpVersion": "8.2",
+  "wordpressVersion": "6.4.2",
+  "created_at": "2024-01-15T10:30:00Z",
+  "storage_used_mb": 512,
+  "storage_limit_mb": 2048
+}
+```
+
+### Health & Monitoring
+
+#### Check Site Health
+
+Monitor the health status of a WordPress installation.
+
+```
+GET /sites/{site_id}/health
+```
+
+**Response Example:**
+```json
+{
+  "status": "healthy",
+  "checks": {
+    "database": "ok",
+    "wordpress": "ok",
+    "php": "ok",
+    "ssl": "ok"
+  },
+  "warnings": [],
+  "uptime_percent": 99.9
+}
+```
+
+#### Get Admin Credentials
+
+Retrieve temporary admin access credentials for WordPress.
+
+```
+POST /sites/{site_id}/credentials
+```
+
+**Response Example:**
+```json
+{
+  "username": "admin",
+  "password": "TempPass123!",
+  "expires_at": "2024-01-16T10:30:00Z",
+  "login_url": "https://example.com/wp-login.php"
+}
+```
+
+### Plugin Management
+
+#### List Plugins
+
+Get all plugins installed on a site with optional status filtering.
+
+```
+GET /sites/{site_id}/plugins?status=active
+```
+
+**Query Parameters:**
+- `status` (optional): `active`, `inactive`, or `all`
+
+**Response Example:**
+```json
+{
+  "plugins": [
+    {
+      "slug": "jetpack",
+      "name": "Jetpack",
+      "version": "13.0",
+      "status": "active",
+      "author": "Automattic"
+    }
+  ]
+}
+```
+
+#### Install Plugin
+
+Install a new plugin from the WordPress plugin directory.
+
+```
+POST /sites/{site_id}/plugins
+```
+
+**Request Body:**
+```json
+{
+  "action": "install",
+  "source": "jetpack",
+  "activate": true
+}
+```
+
+#### Activate Plugin
+
+Activate an installed plugin.
+
+```
+POST /sites/{site_id}/plugins
+```
+
+**Request Body:**
+```json
+{
+  "action": "activate",
+  "plugin": "jetpack/jetpack.php"
+}
+```
+
+#### Deactivate Plugin
+
+Deactivate an active plugin.
+
+```
+POST /sites/{site_id}/plugins
+```
+
+**Request Body:**
+```json
+{
+  "action": "deactivate",
+  "plugin": "jetpack/jetpack.php"
+}
+```
+
+#### Update Plugins
+
+Update all plugins or a specific plugin.
+
+```
+POST /sites/{site_id}/plugins
+```
+
+**Request Body (Update All):**
+```json
+{
+  "action": "update",
+  "plugin": "all"
+}
+```
+
+#### Delete Plugin
+
+Remove a plugin from the WordPress installation.
+
+```
+POST /sites/{site_id}/plugins
+```
+
+**Request Body:**
+```json
+{
+  "action": "delete",
+  "plugin": "jetpack/jetpack.php"
+}
+```
+
+### Theme Management
+
+#### List Themes
+
+Get all themes installed on a site.
+
+```
+GET /sites/{site_id}/themes
+```
+
+**Response Example:**
+```json
+{
+  "themes": [
+    {
+      "slug": "twentytwentyfour",
+      "name": "Twenty Twenty-Four",
+      "version": "1.0",
+      "status": "active",
+      "author": "WordPress.org"
+    }
+  ]
+}
+```
+
+#### Install Theme
+
+Install a new theme from the WordPress theme directory.
+
+```
+POST /sites/{site_id}/themes
+```
+
+**Request Body:**
+```json
+{
+  "action": "install",
+  "source": "twentytwentyfour",
+  "activate": true
+}
+```
+
+#### Activate Theme
+
+Switch to a different active theme.
+
+```
+POST /sites/{site_id}/themes
+```
+
+**Request Body:**
+```json
+{
+  "action": "activate",
+  "theme": "twentytwentyfour"
+}
+```
+
+#### Enable Theme (Network)
+
+Enable a theme network-wide on multisite installations.
+
+```
+POST /sites/{site_id}/themes
+```
+
+**Request Body:**
+```json
+{
+  "action": "enable",
+  "theme": "twentytwentyfour",
+  "network": true
+}
+```
+
+#### Update Themes
+
+Update all themes or a specific theme.
+
+```
+POST /sites/{site_id}/themes
+```
+
+**Request Body:**
+```json
+{
+  "action": "update",
+  "theme": "all"
+}
+```
+
+#### Delete Theme
+
+Remove a theme from the installation.
+
+```
+POST /sites/{site_id}/themes
+```
+
+**Request Body:**
+```json
+{
+  "action": "delete",
+  "theme": "twentytwentyfour"
+}
+```
+
+### User Management
+
+#### List Users
+
+Get all WordPress users on a site.
+
+```
+GET /sites/{site_id}/users
+```
+
+**Response Example:**
+```json
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "email": "admin@example.com",
+      "role": "administrator",
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+#### Create User
+
+Create a new WordPress user account.
+
+```
+POST /sites/{site_id}/users
+```
+
+**Request Body:**
+```json
+{
+  "action": "create",
+  "username": "newuser",
+  "email": "newuser@example.com",
+  "password": "StrongPass123!",
+  "role": "subscriber"
+}
+```
+
+#### Update User
+
+Modify user profile information.
+
+```
+POST /sites/{site_id}/users
+```
+
+**Request Body:**
+```json
+{
+  "action": "update",
+  "user_login": "newuser",
+  "display_name": "New User",
+  "email": "updated@example.com"
+}
+```
+
+#### Set User Role
+
+Change a user's role/capability level.
+
+```
+POST /sites/{site_id}/users
+```
+
+**Request Body:**
+```json
+{
+  "action": "roles",
+  "user_login": "newuser",
+  "role": "editor"
+}
+```
+
+#### Reset Password
+
+Set a new password for a user account.
+
+```
+POST /sites/{site_id}/users
+```
+
+**Request Body:**
+```json
+{
+  "action": "resetPassword",
+  "user_login": "newuser",
+  "password": "NewStrongPass123!"
+}
+```
+
+#### Delete User
+
+Remove a user account from WordPress.
+
+```
+POST /sites/{site_id}/users
+```
+
+**Request Body:**
+```json
+{
+  "action": "delete",
+  "user_login": "newuser"
+}
+```
+
+#### List Available Roles
+
+Get all available WordPress user roles.
+
+```
+POST /sites/{site_id}/users
+```
+
+**Request Body:**
+```json
+{
+  "action": "listRoles"
+}
+```
+
+### File Manager
+
+#### List Files
+
+Browse files and directories on the server.
+
+```
+GET /sites/{site_id}/filemanager?path=/
+```
+
+**Query Parameters:**
+- `path`: Directory path to list (default: `/`)
+
+#### Read File
+
+Read the contents of a file.
+
+```
+POST /sites/{site_id}/filemanager
+```
+
+**Request Body:**
+```json
+{
+  "action": "read",
+  "path": "/wp-config.php"
+}
+```
+
+#### Write File
+
+Create or update file contents.
+
+```
+POST /sites/{site_id}/filemanager
+```
+
+**Request Body:**
+```json
+{
+  "action": "write",
+  "path": "/custom-file.php",
+  "content": "<?php echo 'Hello'; ?>"
+}
+```
+
+#### Create File
+
+Create an empty file.
+
+```
+POST /sites/{site_id}/filemanager
+```
+
+**Request Body:**
+```json
+{
+  "action": "createFile",
+  "path": "/new-file.php"
+}
+```
+
+#### Create Folder
+
+Create a new directory.
+
+```
+POST /sites/{site_id}/filemanager
+```
+
+**Request Body:**
+```json
+{
+  "action": "createFolder",
+  "path": "/wp-content/custom"
+}
+```
+
+#### Rename File/Folder
+
+Rename a file or directory.
+
+```
+POST /sites/{site_id}/filemanager
+```
+
+**Request Body:**
+```json
+{
+  "action": "rename",
+  "from": "/old-name.php",
+  "to": "/new-name.php"
+}
+```
+
+#### Move File/Folder
+
+Move a file or directory to a new location.
+
+```
+POST /sites/{site_id}/filemanager
+```
+
+**Request Body:**
+```json
+{
+  "action": "move",
+  "from": "/file.php",
+  "to": "/wp-content/file.php"
+}
+```
+
+#### Copy Files
+
+Copy files to a new location.
+
+```
+POST /sites/{site_id}/filemanager
+```
+
+**Request Body:**
+```json
+{
+  "action": "copy",
+  "sources": ["/file1.php", "/file2.php"],
+  "target": "/backup/"
+}
+```
+
+#### Delete Files
+
+Remove files or directories.
+
+```
+POST /sites/{site_id}/filemanager
+```
+
+**Request Body:**
+```json
+{
+  "action": "delete",
+  "paths": ["/old-file.php"]
+}
+```
+
+#### Archive Files
+
+Create a compressed archive of files.
+
+```
+POST /sites/{site_id}/filemanager
+```
+
+**Request Body:**
+```json
+{
+  "action": "archive",
+  "sources": ["/wp-content/plugins"],
+  "target": "/backup.zip",
+  "format": "zip"
+}
+```
+
+#### Extract Archive
+
+Extract files from a compressed archive.
+
+```
+POST /sites/{site_id}/filemanager
+```
+
+**Request Body:**
+```json
+{
+  "action": "extract",
+  "source": "/backup.zip",
+  "target": "/",
+  "format": "zip"
+}
+```
+
+---
+
+## Application API
+
+The Application API provides administrative access to manage your entire PlyWP installation. Requires Bearer token and API key authentication.
+
+**Base URL:** `http://localhost:5173/api/application`
+
+**Authentication:**
+```
+Authorization: Bearer {token}
+X-API-Key: {api_key}
+```
+
+### Sites Management
+
+#### List All Sites
+
+Get all WordPress sites in the organization.
+
+```
+GET /sites
+```
+
+**Headers Required:**
+- `Authorization: Bearer {token}`
+- `X-API-Key: {api_key}`
+
+#### Get Site Details
+
+Retrieve information about a specific site.
+
+```
+GET /sites/{site_id}
+```
+
+#### Get Site Credentials
+
+Retrieve stored credentials for a site.
+
+```
+GET /sites/{site_id}/credentials
+```
+
+#### Get Site Statistics
+
+Get performance and usage statistics.
+
+```
+GET /sites/{site_id}/stats
+```
+
+**Response Example:**
+```json
+{
+  "storage_used_mb": 512,
+  "storage_limit_mb": 2048,
+  "uptime_percent": 99.9,
+  "last_backup": "2024-01-20T02:00:00Z",
+  "visitor_count": 15420,
+  "page_views": 45320
+}
+```
+
+#### Synchronize Site
+
+Sync site data with daemon/connector.
+
+```
+POST /sites/{site_id}/sync
+```
+
+#### Resize Site Storage
+
+Adjust storage allocation for a site.
+
+```
+POST /sites/{site_id}/resize
+```
+
+**Request Body:**
+```json
+{
+  "diskLimitMb": 2048
+}
+```
+
+#### Create Site
+
+Provision a new WordPress installation.
+
+```
+POST /sites
+```
+
+**Request Body:**
+```json
+{
+  "organizationId": "org_123",
+  "connectorId": 1,
+  "name": "New Site",
+  "description": "Site description",
+  "domain": "newsite.com",
+  "diskLimitMb": 1024,
+  "phpVersion": "8.3",
+  "adminUser": "admin",
+  "adminPass": "StrongPassword123!",
+  "adminEmail": "admin@newsite.com"
+}
+```
+
+#### Update Site
+
+Modify site configuration.
+
+```
+PATCH /sites/{site_id}
+```
+
+**Request Body:**
+```json
+{
+  "name": "Updated Site Name",
+  "description": "Updated description",
+  "domain": "newdomain.com",
+  "phpVersion": "8.3"
+}
+```
+
+#### Delete Site
+
+Remove a site completely.
+
+```
+DELETE /sites/{site_id}
+```
+
+### Connectors Management
+
+#### List Connectors
+
+Get all server nodes registered as connectors.
+
+```
+GET /connectors
+```
+
+**Response Example:**
+```json
+{
+  "connectors": [
+    {
+      "id": 1,
+      "location_id": 1,
+      "server_ip": "192.168.1.10",
+      "fqdn": "node1.example.com",
+      "webServer": "nginx",
+      "dataDir": "/srv/plywp",
+      "status": "online",
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+#### Get Connector Details
+
+Retrieve information about a specific connector.
+
+```
+GET /connectors/{connector_id}
+```
+
+#### Create Connector
+
+Register a new server node as a connector.
+
+```
+POST /connectors
+```
+
+**Request Body:**
+```json
+{
+  "locationId": 1,
+  "serverIp": "192.168.1.10",
+  "fqdn": "node1.example.com",
+  "webServer": "nginx",
+  "dataDir": "/srv/plywp",
+  "autoSsl": true,
+  "daemonSslEnabled": true,
+  "daemonSslCrt": "-----BEGIN CERTIFICATE-----",
+  "daemonSslKey": "-----BEGIN PRIVATE KEY-----",
+  "dnsServerAddress": "127.0.0.1",
+  "dnsServerPort": 53,
+  "dnsServerProto": "tcp"
+}
+```
+
+#### Update Connector
+
+Modify connector configuration.
+
+```
+PATCH /connectors/{connector_id}
+```
+
+**Request Body:**
+```json
+{
+  "fqdn": "node2.example.com",
+  "serverIp": "192.168.1.11"
+}
+```
+
+#### Delete Connector
+
+Remove a connector node from the system.
+
+```
+DELETE /connectors/{connector_id}
+```
+
+#### Configure Connector
+
+Apply specific configuration to a connector.
+
+```
+POST /connectors/{connector_id}/configure
+```
+
+---
+
+## Common Response Format
+
+All API endpoints follow a consistent response structure:
+
+### Success Response
+
+```json
+{
+  "success": true,
+  "data": {
+    // Response data here
+  },
+  "error": null,
+  "timestamp": "2024-01-15T10:30:00Z"
+}
+```
+
+### Error Response
+
+```json
+{
+  "success": false,
+  "data": null,
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "Missing required field: site_id",
+    "details": {
+      "field": "site_id",
+      "type": "required"
+    }
+  },
+  "timestamp": "2024-01-15T10:30:00Z"
+}
+```
+
+## HTTP Status Codes
+
+| Code | Meaning |
+|------|---------|
+| 200 | OK - Request successful |
+| 201 | Created - Resource created |
+| 204 | No Content - Success with no body |
+| 400 | Bad Request - Invalid parameters |
+| 401 | Unauthorized - Invalid/missing authentication |
+| 403 | Forbidden - Insufficient permissions |
+| 404 | Not Found - Resource doesn't exist |
+| 429 | Too Many Requests - Rate limited |
+| 500 | Server Error - Internal server error |
+
+## Rate Limiting
+
+API requests are rate limited to prevent abuse:
+
+- **Client API**: 1,000 requests per hour per user
+- **Application API**: 5,000 requests per hour per organization
+
+Rate limit information is included in response headers:
+
+```
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 999
+X-RateLimit-Reset: 1705316400
+```
