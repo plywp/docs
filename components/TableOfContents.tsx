@@ -66,14 +66,14 @@ export function TableOfContents() {
 
   return (
     <aside className="hidden lg:block fixed right-0 top-24 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto pr-4">
-      <div className="text-sm font-semibold text-foreground mb-4">On This Page</div>
-      <nav className="space-y-2">
+      <div className="text-sm font-semibold text-foreground mb-4 text-white ">On This Page</div>
+      <nav className="space-y-2 no-underline">
         {headings.map((heading) => (
           <Link
             key={heading.id}
             href={`#${heading.id}`}
             className={cn(
-              'block text-sm transition-colors hover:text-accent',
+              'block text-sm transition-colors hover:text-accent no-underline!',
               activeId === heading.id ? 'text-accent font-medium' : 'text-muted-foreground',
               heading.level === 3 && 'ml-4'
             )}

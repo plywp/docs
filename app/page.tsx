@@ -1,39 +1,51 @@
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import Link from 'next/link';
-import { ArrowRight, Code2, Zap, Shield, Users } from 'lucide-react';
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import Link from "next/link";
+import { ArrowRight, Code2, Zap, Shield, Users } from "lucide-react";
 
 export default function Home() {
   return (
     <>
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="relative py-32 md:py-48 border-b border-border bg-gradient-to-b from-background via-background to-card/20">
         <div className="container max-w-5xl">
           <div className="ml-0 md:ml-8 lg:ml-12">
             <div className="inline-block mb-6 px-3 py-1.5 rounded-full border border-accent/30 bg-accent/10">
-              <span className="text-sm text-accent font-semibold">Open Source WordPress Management</span>
+              <span className="text-sm text-accent font-semibold">
+                Open Source WordPress Management
+              </span>
             </div>
-            
+
             <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-8 text-pretty">
               Complete WordPress Management Suite
             </h1>
-            
+
             <p className="text-lg md:text-xl text-foreground/80 leading-relaxed mb-10 max-w-3xl">
-              PlyWP is a modern, powerful WordPress management platform built for developers and hosting operators. Control, configure, and manage WordPress installations at scale with unparalleled simplicity and power.
+              PlyWP is a modern, powerful WordPress management platform built
+              for developers and hosting operators. Control, configure, and
+              manage WordPress installations at scale with unparalleled
+              simplicity and power.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-16">
               <Link href="/docs">
-                <Button size="lg" className="bg-accent hover:bg-accent/90 text-white gap-2 px-8">
+                <Button
+                  size="lg"
+                  className="bg-accent hover:bg-accent/90 text-white gap-2 px-8"
+                >
                   Get Started
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
-              <a href="https://github.com/plywp" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://github.com/plywp"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Button size="lg" variant="outline" className="px-8">
                   View on GitHub
                 </Button>
@@ -41,7 +53,8 @@ export default function Home() {
             </div>
 
             <p className="text-sm text-muted-foreground font-medium">
-              Free and open source. MIT License. Trusted by developers worldwide.
+              Free and open source. Creative Commons Attribution 4.0
+              International.
             </p>
           </div>
         </div>
@@ -55,7 +68,8 @@ export default function Home() {
               Powerful Features for Modern Development
             </h2>
             <p className="text-lg md:text-xl text-foreground/70 max-w-3xl">
-              Everything you need to manage WordPress installations efficiently and securely at any scale
+              Everything you need to manage WordPress installations efficiently
+              and securely at any scale
             </p>
           </div>
 
@@ -67,9 +81,14 @@ export default function Home() {
               </div>
               <h3 className="text-2xl font-bold mb-4">PlyWP Panel</h3>
               <p className="text-foreground/70 leading-relaxed mb-6">
-                A comprehensive control panel for managing WordPress sites. Monitor performance, manage plugins, handle users, and configure settings from a single intuitive interface.
+                A comprehensive control panel for managing WordPress sites.
+                Monitor performance, manage plugins, handle users, and configure
+                settings from a single intuitive interface.
               </p>
-              <Link href="/docs/installation/panel" className="text-accent font-semibold hover:text-accent/80 inline-flex items-center gap-2 transition-colors">
+              <Link
+                href="/docs/installation/panel"
+                className="text-accent font-semibold hover:text-accent/80 inline-flex items-center gap-2 transition-colors"
+              >
                 Learn More <ArrowRight className="w-4 h-4" />
               </Link>
             </Card>
@@ -81,9 +100,14 @@ export default function Home() {
               </div>
               <h3 className="text-2xl font-bold mb-4">Plyorde Daemon</h3>
               <p className="text-foreground/70 leading-relaxed mb-6">
-                A lightweight daemon that powers core functionality. Handle background tasks, manage services, and enable real-time communication between components with minimal overhead.
+                A lightweight daemon that powers core functionality. Handle
+                background tasks, manage services, and enable real-time
+                communication between components with minimal overhead.
               </p>
-              <Link href="/docs/installation/plyorde" className="text-accent font-semibold hover:text-accent/80 inline-flex items-center gap-2 transition-colors">
+              <Link
+                href="/docs/installation/plyorde"
+                className="text-accent font-semibold hover:text-accent/80 inline-flex items-center gap-2 transition-colors"
+              >
                 Learn More <ArrowRight className="w-4 h-4" />
               </Link>
             </Card>
@@ -95,7 +119,8 @@ export default function Home() {
               </div>
               <h3 className="text-2xl font-bold mb-4">Security First</h3>
               <p className="text-foreground/70 leading-relaxed">
-                Built with security in mind. Implement proper authentication, authorization, and data protection. Audit logs track all changes for compliance and transparency.
+                Built with security in mind. Implement proper authentication,
+                authorization, and data protection. 
               </p>
             </Card>
 
@@ -106,7 +131,8 @@ export default function Home() {
               </div>
               <h3 className="text-2xl font-bold mb-4">Developer Friendly</h3>
               <p className="text-foreground/70 leading-relaxed">
-                RESTful API, comprehensive documentation, and code examples in multiple languages. Build integrations and extensions with ease.
+                RESTful API, comprehensive documentation, and code examples in
+                multiple languages. Build integrations and extensions with ease.
               </p>
             </Card>
           </div>
@@ -121,40 +147,51 @@ export default function Home() {
               Why Choose PlyWP?
             </h2>
             <p className="text-lg md:text-xl text-foreground/70 max-w-3xl">
-              Built for the real world, tested by professionals who demand reliability
+              Built for the real world, who demand
+              reliability
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 ml-0 md:ml-8 lg:ml-12">
             {[
               {
-                title: 'Scalable',
-                description: 'Manage dozens, hundreds, or thousands of WordPress sites from a single platform',
+                title: "Scalable",
+                description:
+                  "Manage dozens, hundreds, or thousands of WordPress sites from a single platform",
               },
               {
-                title: 'Open Source',
-                description: 'Transparent, community-driven development. MIT licensed. No vendor lock-in.',
+                title: "Open Source",
+                description:
+                  "Transparent, community-driven development. MIT licensed. No vendor lock-in.",
               },
               {
-                title: 'Easy to Deploy',
-                description: 'Simple installation process. Works on your infrastructure. Full control and privacy.',
+                title: "Easy to Deploy",
+                description:
+                  "Simple installation process. Works on your infrastructure. Full control and privacy.",
               },
               {
-                title: 'Performance Focused',
-                description: 'Lightweight daemon. Minimal overhead. Built for speed and efficiency.',
+                title: "Performance Focused",
+                description:
+                  "Lightweight daemon. Minimal overhead. Built for speed and efficiency.",
               },
               {
-                title: 'Fully Documented',
-                description: 'Comprehensive guides, API reference, and examples. Get started in minutes.',
+                title: "Fully Documented",
+                description:
+                  "Comprehensive guides, API reference, and examples. Get started in minutes.",
               },
               {
-                title: 'Active Community',
-                description: 'Join developers and hosting operators using PlyWP. Share knowledge and contribute.',
+                title: "Active Community",
+                description:
+                  "Join developers and hosting operators using PlyWP. Share knowledge and contribute.",
               },
             ].map((benefit, index) => (
               <div key={index} className="space-y-3 pb-2">
-                <h3 className="font-bold text-lg text-foreground">{benefit.title}</h3>
-                <p className="text-foreground/70 leading-relaxed">{benefit.description}</p>
+                <h3 className="font-bold text-lg text-foreground">
+                  {benefit.title}
+                </h3>
+                <p className="text-foreground/70 leading-relaxed">
+                  {benefit.description}
+                </p>
               </div>
             ))}
           </div>
@@ -165,12 +202,18 @@ export default function Home() {
       <section className="py-32 md:py-48 border-b border-border">
         <div className="container max-w-5xl">
           <div className="rounded-xl border border-border bg-card/30 backdrop-blur p-12 md:p-16 text-center ml-0 md:ml-8 lg:ml-12">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-pretty">Ready to Get Started?</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-pretty">
+              Ready to Get Started?
+            </h2>
             <p className="text-lg md:text-xl text-foreground/70 mb-10 max-w-3xl mx-auto">
-              Follow our comprehensive installation guides and start managing WordPress like a pro
+              Follow our comprehensive installation guides and start managing
+              WordPress like a pro
             </p>
             <Link href="/docs/installation/panel">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-white gap-2 px-8 h-12">
+              <Button
+                size="lg"
+                className="bg-accent hover:bg-accent/90 text-white gap-2 px-8 h-12"
+              >
                 View Installation Guides
                 <ArrowRight className="w-5 h-5" />
               </Button>
@@ -187,26 +230,28 @@ export default function Home() {
               Comprehensive Documentation
             </h2>
             <p className="text-lg md:text-xl text-foreground/70 max-w-3xl">
-              Everything you need to know about installing, configuring, and using PlyWP
+              Everything you need to know about installing, configuring, and
+              using PlyWP
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 ml-0 md:ml-8 lg:ml-12">
             {[
               {
-                title: 'Installation Guides',
-                description: 'Step-by-step instructions for Panel and Plyorde setup',
-                href: '/docs/installation/panel',
+                title: "Installation Guides",
+                description:
+                  "Step-by-step instructions for Panel and Plyorde setup",
+                href: "/docs/installation/panel",
               },
               {
-                title: 'API Reference',
-                description: 'Complete API documentation with code examples',
-                href: '/docs/api/overview',
+                title: "API Reference",
+                description: "Complete API documentation with code examples",
+                href: "/docs/api/overview",
               },
               {
-                title: 'Architecture Guides',
-                description: 'Understanding how components work together',
-                href: '/docs/guides/architecture',
+                title: "Architecture Guides",
+                description: "Understanding how components work together",
+                href: "/docs/guides/architecture",
               },
             ].map((doc, index) => (
               <Link key={index} href={doc.href}>
