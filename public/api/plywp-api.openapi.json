@@ -1,0 +1,1155 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "PlyWP Ultimate API",
+    "version": "1.0.0",
+    "description": "Complete merged collection covering both the Application API (admin-level) and Client API (site-level) for PlyWP."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5173"
+    }
+  ],
+  "paths": {
+    "/api/application/sites": {
+      "get": {
+        "summary": "List Sites",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Sites"]
+      },
+      "post": {
+        "summary": "Create Site",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Sites"]
+      }
+    },
+    "/api/application/sites/{site_id}": {
+      "get": {
+        "summary": "Get Site",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Sites"]
+      },
+      "parameters": [
+        {
+          "name": "site_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ],
+      "patch": {
+        "summary": "Update Site",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Sites"]
+      },
+      "delete": {
+        "summary": "Delete Site",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Sites"]
+      }
+    },
+    "/api/application/sites/{site_id}/credentials": {
+      "get": {
+        "summary": "Site Credentials",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Sites"]
+      },
+      "parameters": [
+        {
+          "name": "site_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ]
+    },
+    "/api/application/sites/{site_id}/stats": {
+      "get": {
+        "summary": "Site Stats",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Sites"]
+      },
+      "parameters": [
+        {
+          "name": "site_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ]
+    },
+    "/api/application/sites/{site_id}/sync": {
+      "post": {
+        "summary": "Site Sync",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Sites"]
+      },
+      "parameters": [
+        {
+          "name": "site_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ]
+    },
+    "/api/application/sites/{site_id}/resize": {
+      "post": {
+        "summary": "Site Resize",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Sites"]
+      },
+      "parameters": [
+        {
+          "name": "site_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ]
+    },
+    "/api/application/connectors": {
+      "get": {
+        "summary": "List Connectors",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Connectors"]
+      },
+      "post": {
+        "summary": "Create Connector",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Connectors"]
+      }
+    },
+    "/api/application/connectors/{connector_id}": {
+      "get": {
+        "summary": "Get Connector",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Connectors"]
+      },
+      "parameters": [
+        {
+          "name": "connector_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ],
+      "patch": {
+        "summary": "Update Connector",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Connectors"]
+      },
+      "delete": {
+        "summary": "Delete Connector",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Connectors"]
+      }
+    },
+    "/api/application/connectors/{connector_id}/configure": {
+      "post": {
+        "summary": "Connector Configure",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Connectors"]
+      },
+      "parameters": [
+        {
+          "name": "connector_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ]
+    },
+    "/api/application/connectors/{connector_id}/stats": {
+      "get": {
+        "summary": "Connector Stats",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Connectors"]
+      },
+      "parameters": [
+        {
+          "name": "connector_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ]
+    },
+    "/api/application/locations": {
+      "get": {
+        "summary": "List Locations",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Locations"]
+      },
+      "post": {
+        "summary": "Create Location",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Locations"]
+      }
+    },
+    "/api/application/locations/{location_id}": {
+      "get": {
+        "summary": "Get Location",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Locations"]
+      },
+      "parameters": [
+        {
+          "name": "location_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ],
+      "patch": {
+        "summary": "Update Location",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Locations"]
+      },
+      "delete": {
+        "summary": "Delete Location",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Locations"]
+      }
+    },
+    "/api/application/users": {
+      "get": {
+        "summary": "List Users",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 25
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 0
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Users"]
+      },
+      "post": {
+        "summary": "Create User",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Users"]
+      }
+    },
+    "/api/application/users/{user_id}": {
+      "get": {
+        "summary": "Get User",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Users"]
+      },
+      "parameters": [
+        {
+          "name": "user_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ],
+      "patch": {
+        "summary": "Update User",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Users"]
+      },
+      "delete": {
+        "summary": "Delete User",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Users"]
+      }
+    },
+    "/api/application/users/{user_id}/ban": {
+      "post": {
+        "summary": "Ban User",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Users"]
+      },
+      "parameters": [
+        {
+          "name": "user_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ]
+    },
+    "/api/application/users/{user_id}/unban": {
+      "post": {
+        "summary": "Unban User",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Users"]
+      },
+      "parameters": [
+        {
+          "name": "user_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ]
+    },
+    "/api/application/users/{user_id}/reset-password": {
+      "post": {
+        "summary": "Reset User Password",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Users"]
+      },
+      "parameters": [
+        {
+          "name": "user_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ]
+    },
+    "/api/application/settings": {
+      "get": {
+        "summary": "Get Settings",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Settings"]
+      },
+      "patch": {
+        "summary": "Update Settings",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer {{token}}"
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{api_key}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🔧 Application API", "Settings"]
+      }
+    },
+    "/api/client/sites": {
+      "get": {
+        "summary": "List Accessible Sites",
+        "responses": {},
+        "tags": ["🌐 Client API", "Sites"]
+      }
+    },
+    "/api/client/sites/{site_id}": {
+      "get": {
+        "summary": "Get Site Details",
+        "responses": {},
+        "tags": ["🌐 Client API", "Sites"]
+      },
+      "parameters": [
+        {
+          "name": "site_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ]
+    },
+    "/api/client/sites/{site_id}/health": {
+      "get": {
+        "summary": "Site Health",
+        "responses": {},
+        "tags": ["🌐 Client API", "Health"]
+      },
+      "parameters": [
+        {
+          "name": "site_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ]
+    },
+    "/api/client/sites/{site_id}/credentials": {
+      "post": {
+        "summary": "Get Admin Credentials",
+        "responses": {},
+        "tags": ["🌐 Client API", "Credentials"]
+      },
+      "parameters": [
+        {
+          "name": "site_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ]
+    },
+    "/api/client/sites/{site_id}/plugins": {
+      "get": {
+        "summary": "List Plugins",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "active"
+          }
+        ],
+        "responses": {},
+        "tags": ["🌐 Client API", "Plugins"]
+      },
+      "parameters": [
+        {
+          "name": "site_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ],
+      "post": {
+        "summary": "Install Plugin",
+        "responses": {},
+        "tags": ["🌐 Client API", "Plugins"]
+      }
+    },
+    "/api/client/sites/{site_id}/themes": {
+      "get": {
+        "summary": "List Themes",
+        "responses": {},
+        "tags": ["🌐 Client API", "Themes"]
+      },
+      "parameters": [
+        {
+          "name": "site_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ],
+      "post": {
+        "summary": "Install Theme",
+        "responses": {},
+        "tags": ["🌐 Client API", "Themes"]
+      }
+    },
+    "/api/client/sites/{site_id}/users": {
+      "get": {
+        "summary": "List Users",
+        "responses": {},
+        "tags": ["🌐 Client API", "Users (WordPress)"]
+      },
+      "parameters": [
+        {
+          "name": "site_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ],
+      "post": {
+        "summary": "List Roles",
+        "responses": {},
+        "tags": ["🌐 Client API", "Users (WordPress)"]
+      }
+    },
+    "/api/client/sites/{site_id}/filemanager": {
+      "get": {
+        "summary": "List Files",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{path}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🌐 Client API", "File Manager"]
+      },
+      "parameters": [
+        {
+          "name": "site_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ],
+      "post": {
+        "summary": "Read File",
+        "responses": {},
+        "tags": ["🌐 Client API", "File Manager"]
+      }
+    },
+    "/api/client/sites/{site_id}/filemanager/download": {
+      "get": {
+        "summary": "Download File",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{path}}"
+          }
+        ],
+        "responses": {},
+        "tags": ["🌐 Client API", "File Manager"]
+      },
+      "parameters": [
+        {
+          "name": "site_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ]
+    },
+    "/api/client/sites/{site_id}/filemanager/upload": {
+      "post": {
+        "summary": "Upload File",
+        "responses": {},
+        "tags": ["🌐 Client API", "File Manager"]
+      },
+      "parameters": [
+        {
+          "name": "site_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "REPLACE_ME"
+        }
+      ]
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ]
+}

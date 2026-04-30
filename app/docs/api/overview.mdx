@@ -1,0 +1,375 @@
+import { Breadcrumb } from '@/components/Breadcrumb';
+import { TableOfContents } from '@/components/TableOfContents';
+import { CodeBlock } from '@/components/CodeBlock';
+import { Card } from '@/components/ui/card';
+
+export const metadata = {
+  title: 'API Reference Overview - PlyWP Documentation',
+  description: 'PlyWP API overview, getting started guide, and base information.',
+};
+
+<Breadcrumb />
+
+<div className="grid md:grid-cols-[1fr_300px] gap-8">
+<div className="prose">
+
+# API Reference Overview
+
+The PlyWP API provides programmatic access to Plyorde daemon functionality, allowing you to automate WordPress management tasks and integrate with external systems.
+
+## API Basics
+
+### Base URL
+
+```
+http://localhost:8081/api/v1
+```
+
+Or with a custom host:
+
+```
+https://your-plyorde-server.com/api/v1
+```
+
+### Content Type
+
+All requests must include the `Content-Type` header:
+
+```
+Content-Type: application/json
+```
+
+### Response Format
+
+All API responses are returned in JSON format with the following structure:
+
+```json
+{
+  "success": true,
+  "data": {
+    // Response data here
+  },
+  "error": null
+}
+```
+
+Or on error:
+
+```json
+{
+  "success": false,
+  "data": null,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human readable error message"
+  }
+}
+```
+
+## Authentication
+
+The PlyWP API uses token-based authentication. All requests (except public endpoints) require an API token passed in the `Authorization` header.
+
+### Getting an API Token
+
+API tokens are generated through the Panel interface or via the API:
+
+```bash
+curl -X POST http://localhost:8081/api/v1/auth/token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "admin",
+    "password": "password"
+  }'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "expires_in": 604800
+  }
+}
+```
+
+### Using the Token
+
+Include the token in the `Authorization` header:
+
+```bash
+curl http://localhost:8081/api/v1/sites \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+### Token Expiration
+
+Tokens expire after 7 days by default. Expired tokens return a 401 Unauthorized response. Generate a new token to continue access.
+
+### API Keys
+
+For long-lived access, use API keys instead of tokens:
+
+```bash
+curl -X POST http://localhost:8081/api/v1/keys \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{"name": "ci-pipeline"}'
+```
+
+Use API keys in the same way as tokens:
+
+```bash
+curl http://localhost:8081/api/v1/sites \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+## HTTP Methods
+
+The API uses standard HTTP methods:
+
+- **GET** - Retrieve data
+- **POST** - Create new resources
+- **PUT** - Update existing resources
+- **DELETE** - Delete resources
+
+## Status Codes
+
+The API returns standard HTTP status codes:
+
+| Code | Meaning | Example |
+|------|---------|---------|
+| 200 | Success | GET request completed |
+| 201 | Created | Resource successfully created |
+| 204 | No Content | Successful DELETE |
+| 400 | Bad Request | Invalid parameters |
+| 401 | Unauthorized | Missing or invalid token |
+| 403 | Forbidden | Insufficient permissions |
+| 404 | Not Found | Resource doesn't exist |
+| 429 | Too Many Requests | Rate limit exceeded |
+| 500 | Server Error | Internal server error |
+
+## Rate Limiting
+
+The API implements rate limiting to prevent abuse:
+
+- **Rate Limit:** 100 requests per minute per token
+- **Headers:** Rate limit info is included in response headers
+
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1234567890
+```
+
+When you exceed the rate limit, you receive a 429 response:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Rate limit exceeded. Retry after 60 seconds."
+  }
+}
+```
+
+## Pagination
+
+List endpoints support pagination using `limit` and `offset` parameters:
+
+```bash
+curl "http://localhost:8081/api/v1/sites?limit=10&offset=0"
+```
+
+Response includes pagination metadata:
+
+```json
+{
+  "success": true,
+  "data": [
+    // Sites array
+  ],
+  "pagination": {
+    "total": 50,
+    "limit": 10,
+    "offset": 0,
+    "has_more": true
+  }
+}
+```
+
+## Filtering
+
+Use query parameters to filter results:
+
+```bash
+# Filter by status
+curl "http://localhost:8081/api/v1/sites?status=active"
+
+# Multiple filters
+curl "http://localhost:8081/api/v1/sites?status=active&environment=production"
+```
+
+## Sorting
+
+Use the `sort` parameter to sort results:
+
+```bash
+# Sort by name ascending
+curl "http://localhost:8081/api/v1/sites?sort=name:asc"
+
+# Sort by created_at descending
+curl "http://localhost:8081/api/v1/sites?sort=created_at:desc"
+```
+
+## Error Handling
+
+All errors include an error code and message. Example error response:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_SITE_ID",
+    "message": "Site with ID 'invalid-id' not found"
+  }
+}
+```
+
+### Common Error Codes
+
+| Code | Description |
+|------|-------------|
+| INVALID_CREDENTIALS | Username or password incorrect |
+| TOKEN_EXPIRED | Authentication token has expired |
+| INVALID_PARAMETERS | Required parameters missing or invalid |
+| RESOURCE_NOT_FOUND | Requested resource doesn't exist |
+| PERMISSION_DENIED | Insufficient permissions for operation |
+| RATE_LIMIT_EXCEEDED | Too many requests, slow down |
+| SERVER_ERROR | Internal server error |
+
+## Webhooks
+
+The API supports webhooks for real-time event notifications. Register a webhook endpoint to receive events:
+
+```bash
+curl -X POST http://localhost:8081/api/v1/webhooks \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com/webhook",
+    "events": ["site.created", "site.updated"],
+    "secret": "your-webhook-secret"
+  }'
+```
+
+Webhook events are signed with HMAC-SHA256. Verify the signature before processing:
+
+```javascript
+const crypto = require('crypto');
+
+function verifyWebhook(payload, signature, secret) {
+  const hash = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+  return hash === signature;
+}
+```
+
+## SDK and Libraries
+
+Official SDKs are available for popular languages:
+
+- **JavaScript/Node.js:** `npm install plywp-sdk`
+- **Python:** `pip install plywp-sdk`
+- **Go:** `go get github.com/plywp/sdk-go`
+
+## Code Examples
+
+### JavaScript
+
+```javascript
+const PlywpAPI = require('plywp-sdk');
+
+const client = new PlywpAPI({
+  baseURL: 'http://localhost:8081/api/v1',
+  token: 'YOUR_API_TOKEN'
+});
+
+// Get all sites
+const sites = await client.sites.list();
+
+// Create a new site
+const site = await client.sites.create({
+  name: 'My Site',
+  url: 'https://example.com'
+});
+
+// Update a site
+await client.sites.update('site-id', {
+  name: 'Updated Name'
+});
+```
+
+### Python
+
+```python
+from plywp import PlywpAPI
+
+client = PlywpAPI(
+    base_url='http://localhost:8081/api/v1',
+    token='YOUR_API_TOKEN'
+)
+
+# Get all sites
+sites = client.sites.list()
+
+# Create a new site
+site = client.sites.create(
+    name='My Site',
+    url='https://example.com'
+)
+
+# Update a site
+client.sites.update('site-id', name='Updated Name')
+```
+
+### cURL
+
+```bash
+# List sites
+curl http://localhost:8081/api/v1/sites \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+
+# Create a site
+curl -X POST http://localhost:8081/api/v1/sites \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My Site",
+    "url": "https://example.com"
+  }'
+```
+
+## API Versioning
+
+The current API version is `v1`. Future versions may introduce breaking changes. Always specify the version in your requests:
+
+```
+http://localhost:8081/api/v1/...
+```
+
+## Next Steps
+
+- Read the [Authentication Guide](/docs/api/authentication)
+- Explore [Plyorde Endpoints](/docs/api/plyorde/endpoints)
+- Check [Code Examples](/docs/api/plyorde/examples)
+- See [Security Best Practices](/docs/guides/security)
+
+</div>
+
+<TableOfContents />
+</div>

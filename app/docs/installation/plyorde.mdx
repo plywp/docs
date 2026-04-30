@@ -1,0 +1,159 @@
+import { Breadcrumb } from '@/components/Breadcrumb';
+import { TableOfContents } from '@/components/TableOfContents';
+import { CodeBlock } from '@/components/CodeBlock';
+import { Card } from '@/components/ui/card';
+
+export const metadata = {
+  title: 'Plyorde Daemon Installation - PlyWP Documentation',
+  description: 'Complete installation guide for Plyorde daemon service.',
+};
+
+<div className="grid md:grid-cols-[1fr_300px] gap-8 w-auto">
+<div className="prose min-w-0">
+
+# Plyorde Daemon Installation
+
+Plyorde is the engine under the hood of **PlyWP**. As a core daemon service, it manages WordPress operations, executes background tasks, and coordinates system-level services to keep your sites running smoothly[cite: 1].
+
+---
+
+## Prerequisites
+
+Before diving into the installation, ensure your environment meets these minimum requirements[cite: 1]:
+
+<Card className="p-6 my-4">
+* **Memory:** At least 2GB RAM[cite: 1].
+* **Storage:** 10GB minimum available disk space[cite: 1].
+* **Access:** Root or `sudo` privileges[cite: 1].
+* **Connectivity:** Active internet connection to fetch dependencies and binaries[cite: 1].
+</Card>
+
+## System Dependencies
+
+Plyorde relies on several industry-standard tools to manage your server environment[cite: 1].
+
+### Core Requirements
+* **Database:** MariaDB or MySQL[cite: 1].
+* **Web Server:** Nginx, Apache (`apachectl`), or Caddy[cite: 1].
+* **PHP & WP-CLI:** For WordPress core management[cite: 1].
+* **Init System:** `systemd` (systemctl) or `openrc` (rc-service)[cite: 1].
+* **Utilities:** ACL tools (`setfacl`), process managers (`pgrep`, `cron`), and filesystem tools (`e2fsprogs`, `util-linux`)[cite: 1].
+
+### Automated Dependency Install (Debian/Ubuntu)
+Run the following script to prepare your environment with all necessary packages[cite: 1]:
+
+<CodeBlock
+  language="bash"
+  code={`#!/usr/bin/env bash
+set -e
+
+apt update
+apt install -y ca-certificates curl gnupg lsb-release
+
+# Install MariaDB, Nginx, and PHP Stack
+apt install -y mariadb-server mariadb-client nginx \\
+    php-cli php-fpm php-mysql php-curl php-zip \\
+    php-gd php-mbstring php-xml php-intl
+
+# Install WP-CLI
+curl -fsSL https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o /usr/local/bin/wp
+chmod +x /usr/local/bin/wp
+
+# Core Utilities & Filesystem Tools
+apt install -y systemd passwd acl procps cron at \\
+    util-linux e2fsprogs findutils coreutils`}
+/>
+
+---
+
+## Database Configuration
+
+Plyorde needs its own database to store operational data. Use the following snippet to set up a dedicated user and database[cite: 1].
+
+<CodeBlock
+  language="sql"
+  code={`CREATE DATABASE IF NOT EXISTS \\\`plyorde\\\`;
+CREATE USER IF NOT EXISTS 'plyorde'@'localhost' IDENTIFIED BY 'your_strong_password';
+GRANT ALL PRIVILEGES ON \\\`plyorde\\\`.* TO 'plyorde'@'localhost';
+FLUSH PRIVILEGES;`}
+/>
+
+---
+
+## Binary Installation
+
+Download the latest release directly from GitHub. Ensure you choose the architecture that matches your server (e.g., `amd64` or `arm64`)[cite: 1].
+
+<CodeBlock
+  language="bash"
+  code={`# Replace version and arch as needed
+export PLYORDE_VERSION="0.1-alpha"
+export ARCH="amd64"
+
+curl -fsSL "https://github.com/plywp/plyorde/releases/download/\\\${PLYORDE_VERSION}/\\\${ARCH}-linux-plyorde" -o /usr/local/bin/plyorde
+chmod +x /usr/local/bin/plyorde`}
+/>
+
+---
+
+## Configuration & Connection
+
+1.  Log in to your **PlyWP Panel**[cite: 1].
+2.  Navigate to **Admin > Connectors**[cite: 1].
+3.  Create a new connector and enter your server details[cite: 1].
+4.  Switch to the **Configure** tab and copy the generated command[cite: 1].
+5.  Run the command on your server (ensure you have root privileges)[cite: 1].
+
+---
+
+## Daemon Management (systemd)
+
+To ensure Plyorde starts automatically on boot and recovers from crashes, create a systemd service unit[cite: 1].
+
+### Create Service File
+Create a file at `/etc/systemd/system/plyorde.service`[cite: 1]:
+
+<CodeBlock
+  language="ini"
+  filename="/etc/systemd/system/plyorde.service"
+  code={`[Unit]
+Description=Plyorde — PlyWP System Daemon
+After=network.target mariadb.service
+Wants=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/local/bin/plyorde
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target`}
+/>
+
+### Start the Service
+After saving the file, reload systemd and start the daemon[cite: 1]:
+
+<CodeBlock
+  language="bash"
+  code={`systemctl daemon-reload
+systemctl enable plyorde
+systemctl start plyorde`}
+/>
+
+---
+
+## Next Steps
+
+Now that the daemon is humming along, you're ready to start building[cite: 1]:
+
+* **Verify Health:** Run `systemctl status plyorde` to check for a "running" status[cite: 1].
+* **Security:** Review the [Security Hardening Guide](/docs/guides/security)[cite: 1].
+* **Deployment:** Add your first WordPress installation via the Panel[cite: 1].
+
+</div>
+<TableOfContents />
+</div>

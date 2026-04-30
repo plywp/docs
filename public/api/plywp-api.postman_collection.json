@@ -1,0 +1,1101 @@
+{
+	"info": {
+		"name": "PlyWP Ultimate API",
+		"description": "Complete merged collection covering both the Application API (admin-level) and Client API (site-level) for PlyWP.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{ "key": "base_url",        "value": "http://localhost:5173" },
+		{ "key": "token",           "value": "REPLACE_ME",  "description": "Application API Bearer token" },
+		{ "key": "api_key",         "value": "REPLACE_ME",  "description": "Client API key (also used as x-api-key header)" },
+		{ "key": "site_id",         "value": "REPLACE_ME" },
+		{ "key": "connector_id",    "value": "REPLACE_ME" },
+		{ "key": "location_id",     "value": "REPLACE_ME" },
+		{ "key": "user_id",         "value": "REPLACE_ME",  "description": "Application-level user ID" },
+		{ "key": "organization_id", "value": "REPLACE_ME" },
+		{ "key": "path",            "value": "/",            "description": "File path for File Manager" },
+		{ "key": "plugin",          "value": "example-plugin" },
+		{ "key": "theme",           "value": "example-theme" },
+		{ "key": "user_login",      "value": "example-user", "description": "WordPress username for Client Users API" }
+	],
+	"item": [
+		{
+			"name": "🔧 Application API",
+			"description": "Admin-level API. Requires both Authorization: Bearer {{token}} and x-api-key: {{api_key}} headers.",
+			"item": [
+				{
+					"name": "Sites",
+					"item": [
+						{
+							"name": "List Sites",
+							"request": {
+								"method": "GET",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/sites",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "sites"]
+								}
+							}
+						},
+						{
+							"name": "Get Site",
+							"request": {
+								"method": "GET",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/sites/{{site_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "sites", "{{site_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Create Site",
+							"request": {
+								"method": "POST",
+								"header": [
+									{ "key": "Authorization",  "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",      "value": "{{api_key}}" },
+									{ "key": "Content-Type",   "value": "application/json" }
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"organizationId\": \"{{organization_id}}\",\n  \"connectorId\": 1,\n  \"name\": \"Example Site\",\n  \"description\": \"\",\n  \"domain\": \"example.local\",\n  \"diskLimitMb\": 1024,\n  \"phpVersion\": \"8.2\",\n  \"adminUser\": \"admin\",\n  \"adminPass\": \"StrongPassword123!\",\n  \"adminEmail\": \"admin@example.local\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/application/sites",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "sites"]
+								}
+							}
+						},
+						{
+							"name": "Update Site",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{ "key": "Authorization",  "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",      "value": "{{api_key}}" },
+									{ "key": "Content-Type",   "value": "application/json" }
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Updated Site\",\n  \"description\": \"New description\",\n  \"domain\": \"example2.local\",\n  \"phpVersion\": \"8.3\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/application/sites/{{site_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "sites", "{{site_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Delete Site",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/sites/{{site_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "sites", "{{site_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Site Credentials",
+							"request": {
+								"method": "GET",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/sites/{{site_id}}/credentials",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "sites", "{{site_id}}", "credentials"]
+								}
+							}
+						},
+						{
+							"name": "Site Stats",
+							"request": {
+								"method": "GET",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/sites/{{site_id}}/stats",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "sites", "{{site_id}}", "stats"]
+								}
+							}
+						},
+						{
+							"name": "Site Sync",
+							"request": {
+								"method": "POST",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/sites/{{site_id}}/sync",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "sites", "{{site_id}}", "sync"]
+								}
+							}
+						},
+						{
+							"name": "Site Resize",
+							"request": {
+								"method": "POST",
+								"header": [
+									{ "key": "Authorization",  "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",      "value": "{{api_key}}" },
+									{ "key": "Content-Type",   "value": "application/json" }
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"diskLimitMb\": 2048\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/application/sites/{{site_id}}/resize",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "sites", "{{site_id}}", "resize"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Connectors",
+					"item": [
+						{
+							"name": "List Connectors",
+							"request": {
+								"method": "GET",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/connectors",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "connectors"]
+								}
+							}
+						},
+						{
+							"name": "Get Connector",
+							"request": {
+								"method": "GET",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/connectors/{{connector_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "connectors", "{{connector_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Create Connector",
+							"request": {
+								"method": "POST",
+								"header": [
+									{ "key": "Authorization",  "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",      "value": "{{api_key}}" },
+									{ "key": "Content-Type",   "value": "application/json" }
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"locationId\": 1,\n  \"serverIp\": \"192.168.1.10\",\n  \"fqdn\": \"node.example.local\",\n  \"webServer\": \"nginx\",\n  \"dataDir\": \"/srv/plywp\",\n  \"autoSsl\": false,\n  \"daemonSslEnabled\": false,\n  \"daemonSslCrt\": \"\",\n  \"daemonSslKey\": \"\",\n  \"dnsServerAddress\": \"127.0.0.1\",\n  \"dnsServerPort\": 53,\n  \"dnsServerProto\": \"tcp\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/application/connectors",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "connectors"]
+								}
+							}
+						},
+						{
+							"name": "Update Connector",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{ "key": "Authorization",  "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",      "value": "{{api_key}}" },
+									{ "key": "Content-Type",   "value": "application/json" }
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"fqdn\": \"node2.example.local\",\n  \"serverIp\": \"192.168.1.11\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/application/connectors/{{connector_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "connectors", "{{connector_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Delete Connector",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/connectors/{{connector_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "connectors", "{{connector_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Connector Configure",
+							"request": {
+								"method": "POST",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/connectors/{{connector_id}}/configure",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "connectors", "{{connector_id}}", "configure"]
+								}
+							}
+						},
+						{
+							"name": "Connector Stats",
+							"request": {
+								"method": "GET",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/connectors/{{connector_id}}/stats",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "connectors", "{{connector_id}}", "stats"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Locations",
+					"item": [
+						{
+							"name": "List Locations",
+							"request": {
+								"method": "GET",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/locations",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "locations"]
+								}
+							}
+						},
+						{
+							"name": "Get Location",
+							"request": {
+								"method": "GET",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/locations/{{location_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "locations", "{{location_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Create Location",
+							"request": {
+								"method": "POST",
+								"header": [
+									{ "key": "Authorization",  "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",      "value": "{{api_key}}" },
+									{ "key": "Content-Type",   "value": "application/json" }
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"US East\",\n  \"country\": \"US\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/application/locations",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "locations"]
+								}
+							}
+						},
+						{
+							"name": "Update Location",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{ "key": "Authorization",  "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",      "value": "{{api_key}}" },
+									{ "key": "Content-Type",   "value": "application/json" }
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"US East 1\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/application/locations/{{location_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "locations", "{{location_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Delete Location",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/locations/{{location_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "locations", "{{location_id}}"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Users",
+					"item": [
+						{
+							"name": "List Users",
+							"request": {
+								"method": "GET",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/users?limit=25&offset=0",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "users"],
+									"query": [
+										{ "key": "limit",  "value": "25" },
+										{ "key": "offset", "value": "0" }
+									]
+								}
+							}
+						},
+						{
+							"name": "Get User",
+							"request": {
+								"method": "GET",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/users/{{user_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "users", "{{user_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Create User",
+							"request": {
+								"method": "POST",
+								"header": [
+									{ "key": "Authorization",  "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",      "value": "{{api_key}}" },
+									{ "key": "Content-Type",   "value": "application/json" }
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"user@example.com\",\n  \"name\": \"Example User\",\n  \"password\": \"StrongPassword123!\",\n  \"role\": \"user\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/application/users",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "users"]
+								}
+							}
+						},
+						{
+							"name": "Update User",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{ "key": "Authorization",  "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",      "value": "{{api_key}}" },
+									{ "key": "Content-Type",   "value": "application/json" }
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Updated Name\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/application/users/{{user_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "users", "{{user_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Delete User",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/users/{{user_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "users", "{{user_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Ban User",
+							"request": {
+								"method": "POST",
+								"header": [
+									{ "key": "Authorization",  "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",      "value": "{{api_key}}" },
+									{ "key": "Content-Type",   "value": "application/json" }
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"reason\": \"violation\",\n  \"expiresAt\": \"2026-01-01T00:00:00.000Z\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/application/users/{{user_id}}/ban",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "users", "{{user_id}}", "ban"]
+								}
+							}
+						},
+						{
+							"name": "Unban User",
+							"request": {
+								"method": "POST",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/users/{{user_id}}/unban",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "users", "{{user_id}}", "unban"]
+								}
+							}
+						},
+						{
+							"name": "Reset User Password",
+							"request": {
+								"method": "POST",
+								"header": [
+									{ "key": "Authorization",  "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",      "value": "{{api_key}}" },
+									{ "key": "Content-Type",   "value": "application/json" }
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"newPassword\": \"NewStrongPassword123!\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/application/users/{{user_id}}/reset-password",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "users", "{{user_id}}", "reset-password"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Settings",
+					"item": [
+						{
+							"name": "Get Settings",
+							"request": {
+								"method": "GET",
+								"header": [
+									{ "key": "Authorization", "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",     "value": "{{api_key}}" }
+								],
+								"url": {
+									"raw": "{{base_url}}/api/application/settings",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "settings"]
+								}
+							}
+						},
+						{
+							"name": "Update Settings",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{ "key": "Authorization",  "value": "Bearer {{token}}" },
+									{ "key": "x-api-key",      "value": "{{api_key}}" },
+									{ "key": "Content-Type",   "value": "application/json" }
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"PlyWP\",\n  \"description\": \"Managed WordPress\",\n  \"favicon\": \"/uploads/favicon.png\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/application/settings",
+									"host": ["{{base_url}}"],
+									"path": ["api", "application", "settings"]
+								}
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "🌐 Client API",
+			"description": "Site-level API. Authenticated via Bearer {{api_key}} (the client API key).",
+			"item": [
+				{
+					"name": "Sites",
+					"item": [
+						{
+							"name": "List Accessible Sites",
+							"request": {
+								"method": "GET",
+								"url": {
+									"raw": "{{base_url}}/api/client/sites",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites"]
+								}
+							}
+						},
+						{
+							"name": "Get Site Details",
+							"request": {
+								"method": "GET",
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Health",
+					"item": [
+						{
+							"name": "Site Health",
+							"request": {
+								"method": "GET",
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/health",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "health"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Credentials",
+					"item": [
+						{
+							"name": "Get Admin Credentials",
+							"request": {
+								"method": "POST",
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/credentials",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "credentials"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Plugins",
+					"item": [
+						{
+							"name": "List Plugins",
+							"request": {
+								"method": "GET",
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/plugins?status=active",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "plugins"],
+									"query": [{ "key": "status", "value": "active" }]
+								}
+							}
+						},
+						{
+							"name": "Install Plugin",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"action\": \"install\",\n  \"source\": \"{{plugin}}\",\n  \"activate\": true\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/plugins",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "plugins"]
+								}
+							}
+						},
+						{
+							"name": "Activate Plugin",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"activate\",\n  \"plugin\": \"{{plugin}}\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/plugins",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "plugins"]
+								}
+							}
+						},
+						{
+							"name": "Deactivate Plugin",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"deactivate\",\n  \"plugin\": \"{{plugin}}\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/plugins",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "plugins"]
+								}
+							}
+						},
+						{
+							"name": "Update Plugins",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"update\",\n  \"plugin\": \"all\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/plugins",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "plugins"]
+								}
+							}
+						},
+						{
+							"name": "Delete Plugin",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"delete\",\n  \"plugin\": \"{{plugin}}\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/plugins",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "plugins"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Themes",
+					"item": [
+						{
+							"name": "List Themes",
+							"request": {
+								"method": "GET",
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/themes",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "themes"]
+								}
+							}
+						},
+						{
+							"name": "Install Theme",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"install\",\n  \"source\": \"{{theme}}\",\n  \"activate\": true\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/themes",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "themes"]
+								}
+							}
+						},
+						{
+							"name": "Activate Theme",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"activate\",\n  \"theme\": \"{{theme}}\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/themes",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "themes"]
+								}
+							}
+						},
+						{
+							"name": "Enable Theme (Network)",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"enable\",\n  \"theme\": \"{{theme}}\",\n  \"network\": true\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/themes",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "themes"]
+								}
+							}
+						},
+						{
+							"name": "Update Themes",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"update\",\n  \"theme\": \"all\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/themes",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "themes"]
+								}
+							}
+						},
+						{
+							"name": "Delete Theme",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"delete\",\n  \"theme\": \"{{theme}}\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/themes",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "themes"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Users (WordPress)",
+					"item": [
+						{
+							"name": "List Users",
+							"request": {
+								"method": "GET",
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/users",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "users"]
+								}
+							}
+						},
+						{
+							"name": "List Roles",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"listRoles\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/users",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "users"]
+								}
+							}
+						},
+						{
+							"name": "Create User",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"action\": \"create\",\n  \"username\": \"newuser\",\n  \"email\": \"newuser@example.com\",\n  \"password\": \"StrongPass123!\",\n  \"role\": \"subscriber\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/users",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "users"]
+								}
+							}
+						},
+						{
+							"name": "Update User",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"action\": \"update\",\n  \"user_login\": \"{{user_login}}\",\n  \"display_name\": \"Updated Name\",\n  \"email\": \"updated@example.com\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/users",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "users"]
+								}
+							}
+						},
+						{
+							"name": "Set User Role",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"roles\",\n  \"user_login\": \"{{user_login}}\",\n  \"role\": \"editor\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/users",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "users"]
+								}
+							}
+						},
+						{
+							"name": "Reset User Password",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"resetPassword\",\n  \"user_login\": \"{{user_login}}\",\n  \"password\": \"NewStrongPass123!\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/users",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "users"]
+								}
+							}
+						},
+						{
+							"name": "Delete User",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"delete\",\n  \"user_login\": \"{{user_login}}\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/users",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "users"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "File Manager",
+					"item": [
+						{
+							"name": "List Files",
+							"request": {
+								"method": "GET",
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager?path={{path}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "filemanager"],
+									"query": [{ "key": "path", "value": "{{path}}" }]
+								}
+							}
+						},
+						{
+							"name": "Read File",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"read\",\n  \"path\": \"{{path}}\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "filemanager"]
+								}
+							}
+						},
+						{
+							"name": "Write File",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"write\",\n  \"path\": \"{{path}}\",\n  \"content\": \"Hello world\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "filemanager"]
+								}
+							}
+						},
+						{
+							"name": "Create File",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"createFile\",\n  \"path\": \"{{path}}\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "filemanager"]
+								}
+							}
+						},
+						{
+							"name": "Create Folder",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"createFolder\",\n  \"path\": \"{{path}}\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "filemanager"]
+								}
+							}
+						},
+						{
+							"name": "Rename File",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"rename\",\n  \"from\": \"{{path}}\",\n  \"to\": \"{{path}}-renamed\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "filemanager"]
+								}
+							}
+						},
+						{
+							"name": "Move File",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"move\",\n  \"from\": \"{{path}}\",\n  \"to\": \"{{path}}-moved\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "filemanager"]
+								}
+							}
+						},
+						{
+							"name": "Copy Files",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"copy\",\n  \"sources\": [\"{{path}}\"],\n  \"target\": \"/\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "filemanager"]
+								}
+							}
+						},
+						{
+							"name": "Delete Files",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"delete\",\n  \"paths\": [\"{{path}}\"]\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "filemanager"]
+								}
+							}
+						},
+						{
+							"name": "Archive Files",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"archive\",\n  \"sources\": [\"{{path}}\"],\n  \"target\": \"/archive.zip\",\n  \"format\": \"zip\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "filemanager"]
+								}
+							}
+						},
+						{
+							"name": "Extract Archive",
+							"request": {
+								"method": "POST",
+								"header": [{ "key": "Content-Type", "value": "application/json" }],
+								"body": { "mode": "raw", "raw": "{\n  \"action\": \"extract\",\n  \"source\": \"{{path}}\",\n  \"target\": \"/\",\n  \"format\": \"zip\"\n}" },
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "filemanager"]
+								}
+							}
+						},
+						{
+							"name": "Download File",
+							"request": {
+								"method": "GET",
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager/download?path={{path}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "filemanager", "download"],
+									"query": [{ "key": "path", "value": "{{path}}" }]
+								}
+							}
+						},
+						{
+							"name": "Upload File",
+							"request": {
+								"method": "POST",
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{ "key": "path", "value": "/", "type": "text" },
+										{ "key": "file", "type": "file", "src": "/path/to/file.txt" }
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client/sites/{{site_id}}/filemanager/upload",
+									"host": ["{{base_url}}"],
+									"path": ["api", "client", "sites", "{{site_id}}", "filemanager", "upload"]
+								}
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

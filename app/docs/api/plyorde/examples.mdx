@@ -1,0 +1,886 @@
+import { CodeBlock } from '@/components/CodeBlock';
+
+# PlyWP API Examples
+
+Real-world code examples for using the PlyWP Client API and Application API in different programming languages based on actual API schemas.
+
+## Client API Examples
+
+### Authentication
+
+All Client API requests require Bearer token authentication using your API key.
+
+**Setup in cURL:**
+
+```bash
+export API_KEY="your_api_key_here"
+export BASE_URL="http://localhost:5173/api/client"
+```
+
+**Setup in JavaScript:**
+
+```javascript
+const apiKey = process.env.REACT_APP_PLYWP_API_KEY;
+const baseUrl = 'http://localhost:5173/api/client';
+
+const headers = {
+  'Authorization': `Bearer ${apiKey}`,
+  'Content-Type': 'application/json'
+};
+```
+
+**Setup in Python:**
+
+```python
+import os
+
+API_KEY = os.environ.get('PLYWP_API_KEY', 'your_api_key_here')
+BASE_URL = 'http://localhost:5173/api/client'
+
+headers = {
+    'Authorization': f'Bearer {API_KEY}',
+    'Content-Type': 'application/json'
+}
+```
+
+---
+
+## Site Management Examples
+
+### List Sites
+
+**cURL:**
+
+```bash
+curl "$BASE_URL/sites" \
+  -H "Authorization: Bearer $API_KEY"
+```
+
+**JavaScript:**
+
+```javascript
+async function listSites() {
+  const response = await fetch(`${baseUrl}/sites`, {
+    headers
+  });
+  
+  const data = await response.json();
+  return data.sites;
+}
+
+// Usage
+const sites = await listSites();
+sites.forEach(site => {
+  console.log(`${site.name} (${site.domain})`);
+});
+```
+
+**Python:**
+
+```python
+import requests
+
+response = requests.get(
+  f'{BASE_URL}/sites',
+  headers=headers
+)
+
+sites = response.json()['sites']
+for site in sites:
+    print(f"{site['name']} - {site['domain']}")
+```
+
+### Get Site Health
+
+**cURL:**
+
+```bash
+curl "$BASE_URL/sites/{site_id}/health" \
+  -H "Authorization: Bearer $API_KEY"
+```
+
+**JavaScript:**
+
+```javascript
+async function checkSiteHealth(siteId) {
+  const response = await fetch(`${baseUrl}/sites/${siteId}/health`, {
+    headers
+  });
+  
+  const data = await response.json();
+  
+  if (data.status === 'healthy') {
+    console.log(`✓ Site is healthy`);
+    console.log(`Uptime: ${data.uptime_percent}%`);
+  } else {
+    console.log(`⚠ Warnings: ${data.warnings.length}`);
+  }
+  
+  return data;
+}
+```
+
+**Python:**
+
+```python
+def check_site_health(site_id):
+    response = requests.get(
+        f'{BASE_URL}/sites/{site_id}/health',
+        headers=headers
+    )
+    
+    health = response.json()
+    
+    print(f"Status: {health.get('status')}")
+    print(f"Uptime: {health.get('uptime_percent')}%")
+    
+    for check, result in health.get('checks', {}).items():
+        print(f"  {check}: {result}")
+    
+    return health
+```
+
+---
+
+## Plugin Management Examples
+
+### List Plugins
+
+**cURL:**
+
+```bash
+curl "$BASE_URL/sites/{site_id}/plugins?status=active" \
+  -H "Authorization: Bearer $API_KEY"
+```
+
+**JavaScript:**
+
+```javascript
+async function listPlugins(siteId, status = 'all') {
+  const url = new URL(`${baseUrl}/sites/${siteId}/plugins`);
+  url.searchParams.set('status', status);
+  
+  const response = await fetch(url.toString(), { headers });
+  const data = await response.json();
+  
+  return data.plugins;
+}
+
+// List active plugins
+const activePlugins = await listPlugins('site_123', 'active');
+activePlugins.forEach(plugin => {
+  console.log(`${plugin.name} (${plugin.version}) - ${plugin.status}`);
+});
+```
+
+### Install and Activate Plugin
+
+**cURL:**
+
+```bash
+curl -X POST "$BASE_URL/sites/{site_id}/plugins" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "install",
+    "source": "jetpack",
+    "activate": true
+  }'
+```
+
+**JavaScript:**
+
+```javascript
+async function installPlugin(siteId, pluginSlug, autoActivate = true) {
+  const response = await fetch(
+    `${baseUrl}/sites/${siteId}/plugins`,
+    {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        action: 'install',
+        source: pluginSlug,
+        activate: autoActivate
+      })
+    }
+  );
+  
+  const result = await response.json();
+  if (result.success) {
+    console.log(`✓ Installed ${pluginSlug}`);
+  } else {
+    console.error(`✗ Failed to install ${pluginSlug}`);
+  }
+  
+  return result;
+}
+```
+
+### Update All Plugins
+
+**cURL:**
+
+```bash
+curl -X POST "$BASE_URL/sites/{site_id}/plugins" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "update",
+    "plugin": "all"
+  }'
+```
+
+**Python:**
+
+```python
+def update_all_plugins(site_id):
+    response = requests.post(
+        f'{BASE_URL}/sites/{site_id}/plugins',
+        headers=headers,
+        json={
+            'action': 'update',
+            'plugin': 'all'
+        }
+    )
+    
+    result = response.json()
+    if result.get('success'):
+        print('✓ All plugins updated')
+    else:
+        print(f'✗ Update failed: {result.get("error")}')
+    
+    return result
+```
+
+### Deactivate and Delete Plugin
+
+**JavaScript:**
+
+```javascript
+async function deletePlugin(siteId, pluginSlug) {
+  // First deactivate
+  await fetch(`${baseUrl}/sites/${siteId}/plugins`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      action: 'deactivate',
+      plugin: pluginSlug
+    })
+  });
+  
+  // Then delete
+  const response = await fetch(`${baseUrl}/sites/${siteId}/plugins`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      action: 'delete',
+      plugin: pluginSlug
+    })
+  });
+  
+  const result = await response.json();
+  console.log(`✓ Deleted ${pluginSlug}`);
+  return result;
+}
+```
+
+---
+
+## User Management Examples
+
+### Create User
+
+**cURL:**
+
+```bash
+curl -X POST "$BASE_URL/sites/{site_id}/users" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "create",
+    "username": "newuser",
+    "email": "newuser@example.com",
+    "password": "StrongPass123!",
+    "role": "subscriber"
+  }'
+```
+
+**JavaScript:**
+
+```javascript
+async function createUser(siteId, userData) {
+  const response = await fetch(`${baseUrl}/sites/${siteId}/users`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      action: 'create',
+      username: userData.username,
+      email: userData.email,
+      password: userData.password,
+      role: userData.role || 'subscriber'
+    })
+  });
+  
+  const result = await response.json();
+  if (result.success) {
+    console.log(`✓ Created user: ${userData.username}`);
+  }
+  return result;
+}
+
+// Usage
+await createUser('site_123', {
+  username: 'alice',
+  email: 'alice@example.com',
+  password: 'SecurePass123!',
+  role: 'editor'
+});
+```
+
+### List Users
+
+**cURL:**
+
+```bash
+curl "$BASE_URL/sites/{site_id}/users" \
+  -H "Authorization: Bearer $API_KEY"
+```
+
+**Python:**
+
+```python
+def list_users(site_id):
+    response = requests.get(
+        f'{BASE_URL}/sites/{site_id}/users',
+        headers=headers
+    )
+    
+    users = response.json()['users']
+    
+    print(f"Found {len(users)} users:")
+    for user in users:
+        print(f"  {user['username']} ({user['email']}) - {user['role']}")
+    
+    return users
+```
+
+### Bulk Create Users
+
+**Python:**
+
+```python
+def bulk_create_users(site_id, users_list):
+    """Create multiple users at once"""
+    
+    results = []
+    for user in users_list:
+        response = requests.post(
+            f'{BASE_URL}/sites/{site_id}/users',
+            headers=headers,
+            json={
+                'action': 'create',
+                'username': user['username'],
+                'email': user['email'],
+                'password': user['password'],
+                'role': user.get('role', 'subscriber')
+            }
+        )
+        
+        result = response.json()
+        results.append({
+            'username': user['username'],
+            'success': result.get('success')
+        })
+        
+        if result.get('success'):
+            print(f'✓ {user["username"]}')
+        else:
+            print(f'✗ {user["username"]}')
+    
+    return results
+
+# Usage
+new_users = [
+    {'username': 'editor1', 'email': 'editor1@example.com', 'password': 'Pass1!', 'role': 'editor'},
+    {'username': 'author1', 'email': 'author1@example.com', 'password': 'Pass2!', 'role': 'author'}
+]
+
+bulk_create_users('site_123', new_users)
+```
+
+### Update User Role
+
+**JavaScript:**
+
+```javascript
+async function updateUserRole(siteId, username, newRole) {
+  const response = await fetch(`${baseUrl}/sites/${siteId}/users`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      action: 'roles',
+      user_login: username,
+      role: newRole
+    })
+  });
+  
+  const result = await response.json();
+  console.log(`✓ Updated ${username} role to ${newRole}`);
+  return result;
+}
+
+// Usage
+await updateUserRole('site_123', 'alice', 'administrator');
+```
+
+### Reset User Password
+
+**cURL:**
+
+```bash
+curl -X POST "$BASE_URL/sites/{site_id}/users" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "resetPassword",
+    "user_login": "alice",
+    "password": "NewPassword123!"
+  }'
+```
+
+---
+
+## File Manager Examples
+
+### List Files
+
+**cURL:**
+
+```bash
+curl "$BASE_URL/sites/{site_id}/filemanager?path=/" \
+  -H "Authorization: Bearer $API_KEY"
+```
+
+**JavaScript:**
+
+```javascript
+async function listFiles(siteId, path = '/') {
+  const url = new URL(`${baseUrl}/sites/${siteId}/filemanager`);
+  url.searchParams.set('path', path);
+  
+  const response = await fetch(url.toString(), { headers });
+  return await response.json();
+}
+
+// List root directory
+const files = await listFiles('site_123');
+console.log(files);
+```
+
+### Read File
+
+**cURL:**
+
+```bash
+curl -X POST "$BASE_URL/sites/{site_id}/filemanager" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "read",
+    "path": "/wp-config.php"
+  }'
+```
+
+### Archive Files
+
+**Python:**
+
+```python
+def backup_plugins(site_id):
+    """Create a backup of the plugins directory"""
+    
+    response = requests.post(
+        f'{BASE_URL}/sites/{site_id}/filemanager',
+        headers=headers,
+        json={
+            'action': 'archive',
+            'sources': ['/wp-content/plugins'],
+            'target': '/plugins-backup.zip',
+            'format': 'zip'
+        }
+    )
+    
+    result = response.json()
+    if result.get('success'):
+        print('✓ Plugins backed up to plugins-backup.zip')
+    else:
+        print(f'✗ Backup failed: {result.get("error")}')
+    
+    return result
+```
+
+---
+
+## Application API Examples
+
+### List All Sites (Admin)
+
+**cURL:**
+
+```bash
+curl "$APP_API_BASE/sites" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "X-API-Key: $API_KEY"
+```
+
+**JavaScript:**
+
+```javascript
+const token = process.env.PLYWP_AUTH_TOKEN;
+const apiKey = process.env.PLYWP_API_KEY;
+const appApiBase = 'http://localhost:5173/api/application';
+
+async function listAllSites() {
+  const response = await fetch(`${appApiBase}/sites`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'X-API-Key': apiKey,
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  const data = await response.json();
+  return data.data || [];
+}
+
+// Usage
+const sites = await listAllSites();
+sites.forEach(site => {
+  console.log(`${site.name} (${site.domain})`);
+});
+```
+
+### Create Site (Admin)
+
+**cURL:**
+
+```bash
+curl -X POST "$APP_API_BASE/sites" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "X-API-Key: $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "organizationId": "org_123",
+    "connectorId": 1,
+    "name": "New Client Site",
+    "domain": "newclient.com",
+    "diskLimitMb": 1024,
+    "phpVersion": "8.3",
+    "adminUser": "admin",
+    "adminPass": "StrongPassword123!",
+    "adminEmail": "admin@newclient.com"
+  }'
+```
+
+**Python:**
+
+```python
+def create_site(org_id, config):
+    """Create a new WordPress site"""
+    
+    response = requests.post(
+        f'{BASE_URL}/api/application/sites',
+        headers={
+            'Authorization': f'Bearer {TOKEN}',
+            'X-API-Key': API_KEY,
+            'Content-Type': 'application/json'
+        },
+        json={
+            'organizationId': org_id,
+            'connectorId': config.get('connector_id', 1),
+            'name': config['name'],
+            'domain': config['domain'],
+            'diskLimitMb': config.get('disk_limit_mb', 1024),
+            'phpVersion': config.get('php_version', '8.3'),
+            'adminUser': config['admin_user'],
+            'adminPass': config['admin_pass'],
+            'adminEmail': config['admin_email']
+        }
+    )
+    
+    result = response.json()
+    if result.get('success'):
+        site_id = result['data']['id']
+        print(f'✓ Site created: {site_id}')
+        return site_id
+    else:
+        print(f'✗ Failed: {result.get("error")}')
+    
+    return None
+
+# Usage
+site_id = create_site('org_123', {
+    'name': 'Client Site',
+    'domain': 'client.com',
+    'admin_user': 'admin',
+    'admin_pass': 'SecurePass123!',
+    'admin_email': 'admin@client.com'
+})
+```
+
+### Create Connector (Admin)
+
+**JavaScript:**
+
+```javascript
+async function createConnector(config) {
+  const response = await fetch(`${appApiBase}/connectors`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'X-API-Key': apiKey,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      locationId: config.locationId,
+      serverIp: config.serverIp,
+      fqdn: config.fqdn,
+      webServer: config.webServer || 'nginx',
+      dataDir: config.dataDir || '/srv/plywp',
+      autoSsl: config.autoSsl !== false,
+      dnsServerAddress: config.dnsServerAddress || '127.0.0.1',
+      dnsServerPort: config.dnsServerPort || 53
+    })
+  });
+  
+  const result = await response.json();
+  if (result.success) {
+    console.log(`✓ Connector created: ${result.data.id}`);
+  }
+  return result;
+}
+
+// Usage
+await createConnector({
+  locationId: 1,
+  serverIp: '192.168.1.10',
+  fqdn: 'node1.example.com',
+  webServer: 'nginx',
+  autoSsl: true
+});
+```
+
+---
+
+## Automation Examples
+
+### Automated Site Health Monitoring
+
+**Python:**
+
+```python
+import requests
+import time
+from datetime import datetime
+
+API_KEY = os.environ.get('PLYWP_API_KEY')
+BASE_URL = 'http://localhost:5173/api/client'
+
+def monitor_sites(site_ids, interval=300):
+    """Monitor multiple sites every N seconds"""
+    
+    headers = {
+        'Authorization': f'Bearer {API_KEY}',
+        'Content-Type': 'application/json'
+    }
+    
+    while True:
+        for site_id in site_ids:
+            try:
+                response = requests.get(
+                    f'{BASE_URL}/sites/{site_id}/health',
+                    headers=headers,
+                    timeout=10
+                )
+                
+                health = response.json()
+                timestamp = datetime.now().isoformat()
+                
+                if health.get('status') != 'healthy':
+                    print(f"[{timestamp}] ⚠ {site_id}: {health.get('status')}")
+                    
+                    for warning in health.get('warnings', []):
+                        print(f"  - {warning}")
+                
+            except Exception as e:
+                print(f"[{timestamp}] ✗ Error checking {site_id}: {str(e)}")
+        
+        time.sleep(interval)
+
+# Usage
+monitor_sites(['site_123', 'site_456'], interval=300)  # Check every 5 minutes
+```
+
+### Bulk Plugin Updates
+
+**Bash:**
+
+```bash
+#!/bin/bash
+
+API_KEY="${PLYWP_API_KEY}"
+BASE_URL="http://localhost:5173/api/client"
+
+# Array of site IDs
+SITE_IDS=("site_123" "site_456" "site_789")
+
+for SITE_ID in "${SITE_IDS[@]}"; do
+  echo "Updating plugins for $SITE_ID..."
+  
+  curl -X POST "$BASE_URL/sites/$SITE_ID/plugins" \
+    -H "Authorization: Bearer $API_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "action": "update",
+      "plugin": "all"
+    }'
+  
+  echo "✓ Updated $SITE_ID"
+  sleep 5  # Wait between requests
+done
+
+echo "All sites updated!"
+```
+
+### Daily Credential Rotation
+
+**Python:**
+
+```python
+def rotate_admin_credentials(site_id):
+    """Get fresh admin credentials daily"""
+    
+    response = requests.post(
+        f'{BASE_URL}/sites/{site_id}/credentials',
+        headers=headers
+    )
+    
+    if response.status_code == 200:
+        creds = response.json()
+        
+        print(f"New credentials generated:")
+        print(f"  Username: {creds['username']}")
+        print(f"  Login URL: {creds['login_url']}")
+        print(f"  Expires: {creds['expires_at']}")
+        
+        return creds
+    
+    return None
+
+# Can be scheduled with cron or task scheduler
+rotate_admin_credentials('site_123')
+```
+
+---
+
+## Error Handling
+
+### JavaScript Error Handling
+
+```javascript
+async function apiCall(method, endpoint, body = null) {
+  const headers = {
+    'Authorization': `Bearer ${API_KEY}`,
+    'Content-Type': 'application/json'
+  };
+  
+  try {
+    const options = { method, headers };
+    if (body) options.body = JSON.stringify(body);
+    
+    const response = await fetch(`${baseUrl}${endpoint}`, options);
+    const data = await response.json();
+    
+    if (!response.ok) {
+      const error = data.error || {};
+      throw new Error(
+        `${response.status}: ${error.message || response.statusText}`
+      );
+    }
+    
+    return data;
+  } catch (error) {
+    console.error(`API Error (${endpoint}):`, error.message);
+    throw error;
+  }
+}
+
+// Usage with error handling
+try {
+  const sites = await apiCall('GET', '/sites');
+  console.log('Sites:', sites);
+} catch (error) {
+  console.error('Failed to fetch sites:', error);
+  // Implement fallback/retry logic here
+}
+```
+
+### Python Error Handling
+
+```python
+def safe_api_call(method, endpoint, data=None):
+    """Make API call with comprehensive error handling"""
+    
+    url = f'{BASE_URL}{endpoint}'
+    
+    try:
+        if method == 'GET':
+            response = requests.get(url, headers=headers, timeout=30)
+        elif method == 'POST':
+            response = requests.post(url, headers=headers, json=data, timeout=30)
+        else:
+            raise ValueError(f'Unsupported method: {method}')
+        
+        response.raise_for_status()
+        return response.json()
+    
+    except requests.exceptions.Timeout:
+        print(f'✗ Request timeout for {endpoint}')
+        raise
+    except requests.exceptions.ConnectionError:
+        print(f'✗ Connection error for {endpoint}')
+        raise
+    except requests.exceptions.HTTPError as e:
+        error_data = e.response.json() if e.response.text else {}
+        print(f'✗ HTTP {e.response.status_code}: {error_data.get("error", {}).get("message")}')
+        raise
+    except ValueError as e:
+        print(f'✗ Invalid response: {str(e)}')
+        raise
+
+# Usage
+try:
+    result = safe_api_call('GET', '/sites/site_123/health')
+    print(f'Status: {result["status"]}')
+except Exception as e:
+    print(f'Operation failed: {e}')
+```
+
+---
+
+## Best Practices
+
+1. **Store credentials securely** - Use environment variables, never hardcode API keys
+2. **Implement retry logic** - Handle rate limits with exponential backoff
+3. **Use connection pooling** - Reuse HTTP connections for better performance
+4. **Log all requests** - Keep audit trails for debugging and compliance
+5. **Validate inputs** - Check data before sending to API
+6. **Handle errors gracefully** - Provide meaningful error messages
+7. **Cache responses** - Reduce API calls with appropriate caching
+8. **Monitor rate limits** - Check X-RateLimit headers in responses
+
+## Next Steps
+
+- See [API Endpoints Reference](/docs/api/plyorde/endpoints) for complete endpoint list
+- Read [Authentication Guide](/docs/api/authentication) for advanced auth patterns
+- Check [API Overview](/docs/api/overview) for architecture and concepts
