@@ -506,6 +506,14 @@ export default function PanelInstallation() {
           Debian/Ubuntu server. Fill in your configuration above to get
           personalized commands you can copy directly.
         </p>
+        <p className="text-sm text-foreground/70 mb-4">
+          Run the following command to install PlyWP on your server
+          automatically:
+        </p>
+        <CodeBlock
+          code="bash <(curl -s https://plywp-installer.urixen.io/install.sh) | bash"
+          language="bash"
+        />
       </div>
 
       {/* Config panel */}

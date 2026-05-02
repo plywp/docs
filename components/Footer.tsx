@@ -1,5 +1,6 @@
-import { Github } from 'lucide-react';
-import Link from 'next/link';
+import { Github } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 
 export function Footer() {
   return (
@@ -9,19 +10,19 @@ export function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-accent rounded-md flex items-center justify-center text-white text-sm font-bold">
-                P
-              </div>
-              <span className="font-bold text-lg">PlyWP</span>
+              <Image src="/icon.png" alt="Logo" width={200} height={200} />
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Modern WordPress management suite for developers and hosting operators.
+              Modern WordPress management suite for developers and hosting
+              operators.
             </p>
           </div>
 
           {/* Documentation Links */}
           <div>
-            <h3 className="font-semibold mb-6 text-sm uppercase tracking-wide text-foreground">Documentation</h3>
+            <h3 className="font-semibold mb-6 text-sm uppercase tracking-wide text-foreground">
+              Documentation
+            </h3>
             <ul className="space-y-3 text-sm">
               <li>
                 <Link
@@ -41,18 +42,10 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/docs/api/overview"
+                  href="/docs/api/plyorde/endpoints"
                   className="text-muted-foreground hover:text-accent transition-colors font-medium"
                 >
                   API Reference
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/docs/guides/architecture"
-                  className="text-muted-foreground hover:text-accent transition-colors font-medium"
-                >
-                  Guides
                 </Link>
               </li>
             </ul>
@@ -60,7 +53,9 @@ export function Footer() {
 
           {/* Community Links */}
           <div>
-            <h3 className="font-semibold mb-6 text-sm uppercase tracking-wide text-foreground">Community</h3>
+            <h3 className="font-semibold mb-6 text-sm uppercase tracking-wide text-foreground">
+              Community
+            </h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <a

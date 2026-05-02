@@ -246,12 +246,7 @@ export default function Home() {
               {
                 title: "API Reference",
                 description: "Complete API documentation with code examples",
-                href: "/docs/api/overview",
-              },
-              {
-                title: "Architecture Guides",
-                description: "Understanding how components work together",
-                href: "/docs/guides/architecture",
+                href: "/docs/api/plyorde/endpoints",
               },
             ].map((doc, index) => (
               <Link key={index} href={doc.href}>

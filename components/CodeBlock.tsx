@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Copy, Check } from 'lucide-react';
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Copy, Check } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 interface CodeBlockProps {
   code: string;
@@ -10,7 +10,11 @@ interface CodeBlockProps {
   filename?: string;
 }
 
-export function CodeBlock({ code, language = 'bash', filename }: CodeBlockProps) {
+export function CodeBlock({
+  code,
+  language = "bash",
+  filename,
+}: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -20,14 +24,14 @@ export function CodeBlock({ code, language = 'bash', filename }: CodeBlockProps)
   };
 
   return (
-    <div className="rounded-xl border border-border/50 overflow-hidden bg-card/40 backdrop-blur-sm my-6">
+    <div className="rounded-xl border border-border/50 overflow-hidden bg-card/40 backdrop-blur-sm max-w-screen">
       {filename && (
         <div className="px-6 py-3 bg-background/50 border-b border-border/50 text-xs text-muted-foreground font-mono font-semibold uppercase tracking-wide">
           {filename}
         </div>
       )}
-      <div className="relative">
-        <pre className="!my-0 !bg-transparent !border-0 !rounded-0 p-6 text-sm overflow-x-auto">
+      <div className="relative flex flex-col flex-wrap max-w-screen">
+        <pre className="!my-0 !bg-transparent !border-0 !rounded-0 p-6 text-sm overflow-hidden flex flex-wrap">
           <code className={`language-${language}`}>{code}</code>
         </pre>
         <Button
